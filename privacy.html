@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CoLabRoom Privacy Policy</title>
+<meta name="description" content="What CoLabRoom collects, who it's shared with, and how to delete it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root {
+    --ink: #050B16;
+    --surface: #0A1728;
+    --line: #16304F;
+    --line-soft: #102743;
+    --text: #F2F7FF;
+    --body: #C6D3E8;
+    --muted: #8A9AB6;
+    --cyan: #3AD3FF;
+    --gold: #E3B34D;
+
+    --display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --measure: 38rem;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--body);
+    font-family: var(--serif);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  a { color: var(--cyan); }
+  a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+  .page {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: clamp(2.5rem, 6vw, 4.5rem) 1.25rem 5rem;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 2.5rem;
+  }
+  .back:hover { color: var(--cyan); }
+
+  h1 {
+    font-family: var(--display);
+    color: var(--text);
+    font-size: clamp(1.9rem, 1.5rem + 1.8vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    margin: 0 0 0.6rem;
+  }
+
+  .updated {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin: 0 0 2.75rem;
+  }
+
+  .notice {
+    font-size: 0.94rem;
+    color: var(--muted);
+    border-left: 2px solid var(--gold);
+    padding-left: 1rem;
+    margin-bottom: 3rem;
+    max-width: var(--measure);
+  }
+
+  h2 {
+    font-family: var(--display);
+    color: var(--text);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.008em;
+    margin: 3rem 0 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-soft);
+  }
+  h2:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+
+  h3 {
+    font-family: var(--display);
+    color: var(--text);
+    font-size: 0.98rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.5rem;
+  }
+
+  p { margin: 0 0 1.05rem; max-width: var(--measure); }
+
+  ul, ol { margin: 0 0 1.05rem; padding-left: 1.25rem; max-width: var(--measure); }
+  li { margin-bottom: 0.5rem; }
+
+  .table {
+    border: 1px solid var(--line-soft);
+    border-radius: 0.6rem;
+    overflow: hidden;
+    margin: 0 0 1.3rem;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 0.25rem 1rem;
+    padding: 0.75rem 0.9rem;
+    background: var(--surface);
+    font-size: 0.94rem;
+  }
+  .row + .row { border-top: 1px solid var(--line-soft); }
+  .row .who {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  @media (max-width: 34rem) {
+    .row { grid-template-columns: 1fr; }
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    color: var(--text);
+    background: var(--surface);
+    padding: 0.1em 0.35em;
+    border-radius: 0.3em;
+  }
+
+  footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--cyan); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a class="back" href="/">← CoLabRoom</a>
+
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated August 24, 2026 · Effective for the CoLabRoom beta</p>
+
+  <p class="notice">
+    CoLabRoom is published by <strong style="color: var(--text)">Decibel Zero LLC</strong>
+    ("we", "us"). This describes what the app actually collects and where it
+    actually goes — not a generic template. If anything here stops matching
+    what the app does, tell us at
+    <a href="mailto:support@colabroom.com">support@colabroom.com</a>.
+  </p>
+
+  <h2>What we collect</h2>
+
+  <h3>Account</h3>
+  <p>Your email address, a display name, and an optional profile picture.</p>
+
+  <h3>What you write and record</h3>
+  <p>
+    Song lyrics and chord annotations, comments, Room and song names, and any
+    voice notes or reference recordings you attach to a song. All of it is
+    stored so the people in your Room can see and hear it — that's the point
+    of the app.
+  </p>
+
+  <h3>What you import</h3>
+  <p>
+    Lyric sheets you import (PDF, Word, Excel, and the other formats CoLabRoom
+    reads) are parsed on your own device before anything is saved. A public
+    Google Sheet link is fetched only from the link you supply.
+  </p>
+
+  <h3>Invitations</h3>
+  <p>The email address of anyone you invite to a Room.</p>
+
+  <h3>Feedback and diagnostics</h3>
+  <p>
+    If you send feedback, we store its category, your message, the screen you
+    were on, and your app version and platform. If the app crashes or hits an
+    unexpected error, the same version/platform information and an error
+    message are recorded automatically so we can find and fix it — this
+    doesn't include your song content.
+  </p>
+
+  <h2>Analysis: where a recording actually goes</h2>
+  <p>
+    Analysing a recording is something you ask for, per song — it isn't
+    automatic. When you do:
+  </p>
+  <div class="table">
+    <div class="row"><span class="who">Supabase</span><span>Stores the recording, your account data, and every song in the app. Our database and file storage provider.</span></div>
+    <div class="row"><span class="who">RunPod</span><span>Runs our own instrument-separation code on their GPUs, to split the recording into stems.</span></div>
+    <div class="row"><span class="who">Google Cloud Run</span><span>Runs our own chord-detection code, to work out what's being played.</span></div>
+    <div class="row"><span class="who">OpenAI</span><span>If there's singing, the isolated vocal — not the full mix — is sent to OpenAI's transcription API to work out the words. Governed by <a href="https://openai.com/policies/api-data-usage-policies" target="_blank" rel="noopener">OpenAI's own API data terms</a>.</span></div>
+  </div>
+  <p>
+    RunPod and Google Cloud Run are infrastructure we run our own code on —
+    they don't process your recording for their own purposes. OpenAI is the
+    one genuine third party in this chain, and it only ever receives the
+    isolated vocal, only when you ask for lyric analysis.
+  </p>
+  <p>
+    Analyses are cached by the recording's fingerprint: the exact same audio
+    file, analysed again by anyone, reuses the first result instead of being
+    reprocessed. Nobody can reach an analysis without already having the
+    recording it came from.
+  </p>
+
+  <h2>Who can see what</h2>
+  <p>
+    A Room and everything in it — songs, lyrics, comments, recordings — is
+    visible only to that Room's members. Nothing you write or record is
+    public by default, and there is no public profile or public song page in
+    this app.
+  </p>
+
+  <h2>How long we keep it</h2>
+  <p>
+    Until you delete it or delete your account. There's currently no
+    automatic expiry on feedback or diagnostic records — we're telling you
+    that plainly rather than implying a cleanup schedule that doesn't exist
+    yet.
+  </p>
+
+  <h2>Your controls</h2>
+  <ul>
+    <li>Delete a voice note, a recording, or a song at any time from inside the app.</li>
+    <li>Export a song or setlist as text or a printable PDF.</li>
+    <li>
+      Delete your account from <strong style="color: var(--text)">Account → Delete account</strong>.
+      This is immediate, permanent, and has no recovery window — see the
+      account-deletion details on the <a href="/#beta">CoLabRoom home page</a>
+      for exactly what it removes, including what happens to Rooms you own.
+    </li>
+    <li>Can't sign in? Email <a href="mailto:support@colabroom.com">support@colabroom.com</a> from the address you signed up with.</li>
+  </ul>
+
+  <h2>Children</h2>
+  <p>
+    CoLabRoom isn't directed at children under 13, and we don't knowingly
+    collect information from anyone under 13. If you believe a child has
+    created an account, contact
+    <a href="mailto:support@colabroom.com">support@colabroom.com</a> and we'll
+    remove it.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    If this policy changes in a way that matters — a new third party in the
+    analysis chain, a change to what we keep — we'll update the date at the
+    top and, for anything material, say so inside the app.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Decibel Zero LLC — <a href="mailto:support@colabroom.com">support@colabroom.com</a>
+  </p>
+
+  <footer>
+    <a href="/">CoLabRoom</a> · <a href="/terms.html">Terms of Service</a>
+  </footer>
+
+</div>
+</body>
+</html>
