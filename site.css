@@ -217,3 +217,130 @@ footer .sp { flex: 1; }
   .reveal.in { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ============================================================
+   The stage: the page as a multitrack.
+
+   The site is about layering takes over each other, so the background
+   performs that while you read about it. One waveform lane is playing
+   when you arrive; reach the second section and a second fades up
+   beneath it; by the fourth you are looking at an arrangement, with a
+   playhead that has been travelling down the page the whole way.
+
+   Held far enough back that it never competes with the type. This is
+   meant to be noticed second, on the way past — and nothing here is the
+   only place anything is said.
+   ============================================================ */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* One rule lifts every page's content above the stage. */
+.wrap { position: relative; z-index: 1; }
+
+.lane {
+  position: absolute;
+  left: -4%;
+  width: 108%;
+  height: 15vh;
+  opacity: 0;
+}
+.lane svg { width: 100%; height: 100%; display: block; }
+.lane svg rect { fill: currentColor; }
+
+.lane.l1 { top: 24vh; color: var(--a1); }
+.lane.l2 { top: 44vh; color: var(--a2); }
+.lane.l3 { top: 64vh; color: var(--a3); }
+
+.inst {
+  position: absolute;
+  width: clamp(9rem, 24vw, 19rem);
+  aspect-ratio: 1;
+  color: var(--text);
+  opacity: 0;
+}
+.inst svg { width: 100%; height: 100%; display: block; }
+
+.inst.i1 { top: 12vh; right: 4vw; }
+.inst.i2 { top: 30vh; left: 3vw; }
+.inst.i3 { top: 48vh; right: 6vw; }
+.inst.i4 { top: 26vh; left: 8vw; }
+
+/* One hairline crossing the page as you read, the way a playhead crosses
+   a take. */
+.playhead {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold) 80%, transparent);
+  opacity: 0.2;
+}
+
+/* Two drivers for one set of animations. Where scroll-driven CSS exists
+   the browser runs these off the main thread and they cannot judder.
+   Firefox stable does not have it yet, so stage.js writes the same
+   progress into --scroll and the fallback block below reads it. */
+
+@keyframes lane-1 { 0% { opacity: 0 } 12% { opacity: .15 } 70% { opacity: .15 } 100% { opacity: .05 } }
+@keyframes lane-2 { 0% { opacity: 0 } 30% { opacity: 0 } 46% { opacity: .14 } 100% { opacity: .06 } }
+@keyframes lane-3 { 0% { opacity: 0 } 55% { opacity: 0 } 70% { opacity: .12 } 100% { opacity: .07 } }
+@keyframes drift  { 0% { transform: translateY(5vh) } 100% { transform: translateY(-5vh) } }
+@keyframes inst-1 { 0% { opacity: .07 } 22% { opacity: .07 } 34% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes inst-2 { 0% { opacity: 0 } 24% { opacity: 0 } 36% { opacity: .07 } 50% { opacity: .07 } 62% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes inst-3 { 0% { opacity: 0 } 52% { opacity: 0 } 64% { opacity: .07 } 78% { opacity: .07 } 88% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes inst-4 { 0% { opacity: 0 } 78% { opacity: 0 } 90% { opacity: .07 } 100% { opacity: .05 } }
+@keyframes head   { 0% { top: 0 } 100% { top: 100% } }
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lane, .inst, .playhead {
+      animation-timeline: scroll(root block);
+      animation-duration: 1ms; /* ignored on a scroll timeline; the syntax wants one */
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+    }
+    .lane.l1 { animation-name: lane-1, drift; }
+    .lane.l2 { animation-name: lane-2, drift; }
+    .lane.l3 { animation-name: lane-3, drift; }
+    .inst.i1 { animation-name: inst-1; }
+    .inst.i2 { animation-name: inst-2; }
+    .inst.i3 { animation-name: inst-3; }
+    .inst.i4 { animation-name: inst-4; }
+    .playhead { animation-name: head; }
+  }
+}
+
+@supports not (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    :root { --scroll: 0; }
+    .lane, .inst { transition: opacity .4s linear; }
+    .lane.l1 { opacity: calc(0.15 * clamp(0, var(--scroll) * 8, 1)); }
+    .lane.l2 { opacity: calc(0.14 * clamp(0, (var(--scroll) - 0.3) * 7, 1)); }
+    .lane.l3 { opacity: calc(0.12 * clamp(0, (var(--scroll) - 0.55) * 7, 1)); }
+    .inst.i1 { opacity: calc(0.07 * clamp(0, (0.34 - var(--scroll)) * 8, 1)); }
+    .inst.i2 { opacity: calc(0.07 * clamp(0, min((var(--scroll) - 0.24) * 8, (0.62 - var(--scroll)) * 8), 1)); }
+    .inst.i3 { opacity: calc(0.07 * clamp(0, min((var(--scroll) - 0.52) * 8, (0.88 - var(--scroll)) * 8), 1)); }
+    .inst.i4 { opacity: calc(0.07 * clamp(0, (var(--scroll) - 0.78) * 8, 1)); }
+    .playhead { top: calc(var(--scroll) * 100%); }
+  }
+}
+
+/* Reduced motion keeps the arrangement and drops the performance: lanes
+   rest at a quiet opacity, nothing moves, no playhead is drawn. */
+@media (prefers-reduced-motion: reduce) {
+  .lane.l1, .lane.l2, .lane.l3 { opacity: 0.07; }
+  .inst.i1, .inst.i4 { opacity: 0.05; }
+}
+
+/* The line that tells a first-time visitor what they are looking at.
+   Without it the hero is a poem next to a button — memorable, and no help
+   at all to somebody who has never heard of this. */
+.kicker {
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem;
+}
