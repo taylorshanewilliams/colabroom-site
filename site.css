@@ -211,6 +211,36 @@ details.legal .inner p { margin-top: 0.9rem; }
 details.legal h3 { font-size: 0.95rem; font-weight: 800; color: var(--text); margin: 1.75rem 0 0.5rem; }
 details.legal ol { padding-left: 1.2rem; margin: 0.5rem 0; }
 
+/* ---------- where to go next ----------
+   The bottom of a page was a dead end: finish reading and the only way
+   onward was to scroll all the way back up to the nav. Repeating that nav
+   here would work, but it answers "where can I go" when the question at
+   the end of a page is "what should I read next" — so these carry what
+   each page actually says, and the page you are on is left out. */
+.keep-reading { padding: 3.5rem 0 1rem; border-top: 1px solid var(--line); }
+.onward-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.onward {
+  flex: 1 1 14rem;
+  display: block;
+  padding: 1.1rem 1.2rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  text-decoration: none;
+  transition: border-color .2s ease, background .2s ease;
+}
+.onward:hover { border-color: var(--cyan); background: var(--raised, var(--surface)); }
+.onward .where {
+  display: block;
+  font-family: var(--display); font-weight: 800; font-size: 1rem;
+  color: var(--text); letter-spacing: -0.01em;
+}
+.onward .what {
+  display: block; margin-top: 0.35rem;
+  font-family: var(--serif); font-size: 0.92rem; line-height: 1.4;
+  color: var(--muted);
+}
+
 footer {
   border-top: 1px solid var(--line); padding: 2rem 0 3rem;
   display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: center;
@@ -446,6 +476,10 @@ footer .sp { flex: 1; }
 
   .lyric em { font-size: 1rem; }
   .lyric .chords { padding-left: 0; }
+
+  .keep-reading { padding: 2.5rem 0 0.5rem; }
+  .onward { flex-basis: 100%; padding: 0.9rem 1rem; }
+  .onward .what { font-size: 0.88rem; }
 
   footer { gap: 0.4rem 1rem; }
   footer .sp { flex-basis: 100%; }
