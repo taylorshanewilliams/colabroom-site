@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analysis — CoLabRoom</title>
+<meta name="description" content="Play a song once into your phone and get the key, the tempo, the chords, the song's shape, the words you sang, and every instrument separated out.">
+<meta property="og:title" content="Analysis — CoLabRoom">
+<meta property="og:description" content="Play it once. Find out what you played.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <a class="brand" href="index.html">CoLabRoom</a>
+    <nav class="pages">
+      <a href="takes.html">Takes</a>
+      <a href="analysis.html" aria-current="page">Analysis</a>
+      <a href="songbook.html">Songbook</a>
+      <a href="bands.html">Bands</a>
+    </nav>
+    <span class="sp"></span>
+    <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta">Join the beta</a>
+  </header>
+
+  <div class="hero inner">
+    <h1>Play it once. Find out what you played.</h1>
+    <p>
+      One pass of a phone recording. No tapping tempo, no naming the key, no
+      typing the chords in afterwards.
+    </p>
+  </div>
+
+  <section class="moment reveal">
+    <div class="eyebrow">What comes back</div>
+    <h2>The numbers you would have worked out by ear.</h2>
+    <div class="art stats" aria-hidden="true">
+      <div class="stat"><div class="k">Key</div><div class="v">D major</div></div>
+      <div class="stat"><div class="k">Tempo</div><div class="v">118 BPM</div></div>
+      <div class="stat"><div class="k">Time</div><div class="v">4/4</div></div>
+      <div class="stat"><div class="k">Bars</div><div class="v">96</div></div>
+      <div class="stat"><div class="k">Chords</div><div class="v">92%</div></div>
+      <div class="stat"><div class="k">Stems</div><div class="v">6</div></div>
+    </div>
+  </section>
+
+  <section class="moment reveal">
+    <div class="eyebrow">Shape</div>
+    <h2>Where the chorus starts.</h2>
+    <p class="lede">
+      Not letters. The parts get the names a musician would use, so the song's
+      form reads back the way you would describe it out loud — and you can
+      rename any part to whatever your band actually calls it.
+    </p>
+    <div class="art" aria-hidden="true">
+      <div class="form">
+        <span style="background:var(--a4);flex:0.6">In</span>
+        <span style="background:var(--a1);flex:1.4">Verse</span>
+        <span style="background:var(--a2);flex:1.2">Chorus</span>
+        <span style="background:var(--a1);flex:1.4">Verse</span>
+        <span style="background:var(--a2);flex:1.2">Chorus</span>
+        <span style="background:var(--a3);flex:0.9">Bridge</span>
+        <span style="background:var(--a2);flex:1.2">Chorus</span>
+        <span style="background:var(--a4);flex:0.5">Out</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="moment reveal">
+    <div class="eyebrow">Apart</div>
+    <h2>Hear one instrument at a time.</h2>
+    <p class="lede">
+      The recording comes back separated, so you can solo the bass to learn the
+      line, or mute yourself and play along with the rest of the band when the
+      rest of the band is not there.
+    </p>
+    <div class="art pill-row" aria-hidden="true">
+      <span class="pill">Vocals</span>
+      <span class="pill">Guitar</span>
+      <span class="pill">Piano</span>
+      <span class="pill">Bass</span>
+      <span class="pill">Drums</span>
+      <span class="pill">Other</span>
+    </div>
+  </section>
+
+  <section class="moment reveal">
+    <div class="eyebrow">Honesty</div>
+    <h2>It tells you when it is guessing.</h2>
+    <p class="lede">
+      Chord detection is good, not perfect, and a machine cannot know that the
+      repeated bit is the chorus rather than the verse. So every answer carries
+      how much of the song it actually covered, anything uncertain is flagged
+      rather than smoothed over, and you can correct any of it in a tap. A
+      confident wrong answer is worse than an honest gap.
+    </p>
+  </section>
+
+  <div class="close">
+    <h2>Bring a song.</h2>
+    <p>The beta is small and free, and I read everything that comes back.</p>
+    <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta">Join the beta</a>
+    <div class="meta">For iPhone and Android</div>
+  </div>
+
+  <footer>
+    <span>CoLabRoom — songwriting for bands</span>
+    <span class="sp"></span>
+    <a href="index.html#beta">Account deletion</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </footer>
+
+</div>
+
+<script src="reveal.js"></script>
+</body>
+</html>
