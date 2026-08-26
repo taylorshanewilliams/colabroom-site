@@ -25,6 +25,15 @@
   --display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
   --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
   --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* How loud the background plays.
+     A phone overrides these near the bottom of this file: the same opacity
+     that reads as texture across a laptop is invisible on a screen a quarter
+     the size, held at arm's length, often in daylight. */
+  --lane-peak: 0.15;
+  --lane-rest: 0.06;
+  --inst-peak: 0.07;
+  --inst-rest: 0.05;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -286,14 +295,14 @@ footer .sp { flex: 1; }
    Firefox stable does not have it yet, so stage.js writes the same
    progress into --scroll and the fallback block below reads it. */
 
-@keyframes lane-1 { 0% { opacity: 0 } 12% { opacity: .15 } 70% { opacity: .15 } 100% { opacity: .05 } }
-@keyframes lane-2 { 0% { opacity: 0 } 30% { opacity: 0 } 46% { opacity: .14 } 100% { opacity: .06 } }
-@keyframes lane-3 { 0% { opacity: 0 } 55% { opacity: 0 } 70% { opacity: .12 } 100% { opacity: .07 } }
+@keyframes lane-1 { 0% { opacity: 0 } 12% { opacity: var(--lane-peak) } 70% { opacity: var(--lane-peak) } 100% { opacity: var(--lane-rest) } }
+@keyframes lane-2 { 0% { opacity: 0 } 30% { opacity: 0 } 46% { opacity: var(--lane-peak) } 100% { opacity: var(--lane-rest) } }
+@keyframes lane-3 { 0% { opacity: 0 } 55% { opacity: 0 } 70% { opacity: var(--lane-peak) } 100% { opacity: var(--lane-rest) } }
 @keyframes drift  { 0% { transform: translateY(5vh) } 100% { transform: translateY(-5vh) } }
-@keyframes inst-1 { 0% { opacity: .07 } 22% { opacity: .07 } 34% { opacity: 0 } 100% { opacity: 0 } }
-@keyframes inst-2 { 0% { opacity: 0 } 24% { opacity: 0 } 36% { opacity: .07 } 50% { opacity: .07 } 62% { opacity: 0 } 100% { opacity: 0 } }
-@keyframes inst-3 { 0% { opacity: 0 } 52% { opacity: 0 } 64% { opacity: .07 } 78% { opacity: .07 } 88% { opacity: 0 } 100% { opacity: 0 } }
-@keyframes inst-4 { 0% { opacity: 0 } 78% { opacity: 0 } 90% { opacity: .07 } 100% { opacity: .05 } }
+@keyframes inst-1 { 0% { opacity: var(--inst-peak) } 22% { opacity: var(--inst-peak) } 34% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes inst-2 { 0% { opacity: 0 } 24% { opacity: 0 } 36% { opacity: var(--inst-peak) } 50% { opacity: var(--inst-peak) } 62% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes inst-3 { 0% { opacity: 0 } 52% { opacity: 0 } 64% { opacity: var(--inst-peak) } 78% { opacity: var(--inst-peak) } 88% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes inst-4 { 0% { opacity: 0 } 78% { opacity: 0 } 90% { opacity: var(--inst-peak) } 100% { opacity: var(--inst-rest) } }
 @keyframes head   { 0% { top: 0 } 100% { top: 100% } }
 
 @supports (animation-timeline: scroll()) {
@@ -319,13 +328,13 @@ footer .sp { flex: 1; }
   @media (prefers-reduced-motion: no-preference) {
     :root { --scroll: 0; }
     .lane, .inst { transition: opacity .4s linear; }
-    .lane.l1 { opacity: calc(0.15 * clamp(0, var(--scroll) * 8, 1)); }
-    .lane.l2 { opacity: calc(0.14 * clamp(0, (var(--scroll) - 0.3) * 7, 1)); }
-    .lane.l3 { opacity: calc(0.12 * clamp(0, (var(--scroll) - 0.55) * 7, 1)); }
-    .inst.i1 { opacity: calc(0.07 * clamp(0, (0.34 - var(--scroll)) * 8, 1)); }
-    .inst.i2 { opacity: calc(0.07 * clamp(0, min((var(--scroll) - 0.24) * 8, (0.62 - var(--scroll)) * 8), 1)); }
-    .inst.i3 { opacity: calc(0.07 * clamp(0, min((var(--scroll) - 0.52) * 8, (0.88 - var(--scroll)) * 8), 1)); }
-    .inst.i4 { opacity: calc(0.07 * clamp(0, (var(--scroll) - 0.78) * 8, 1)); }
+    .lane.l1 { opacity: calc(var(--lane-peak) * clamp(0, var(--scroll) * 8, 1)); }
+    .lane.l2 { opacity: calc(var(--lane-peak) * clamp(0, (var(--scroll) - 0.3) * 7, 1)); }
+    .lane.l3 { opacity: calc(var(--lane-peak) * clamp(0, (var(--scroll) - 0.55) * 7, 1)); }
+    .inst.i1 { opacity: calc(var(--inst-peak) * clamp(0, (0.34 - var(--scroll)) * 8, 1)); }
+    .inst.i2 { opacity: calc(var(--inst-peak) * clamp(0, min((var(--scroll) - 0.24) * 8, (0.62 - var(--scroll)) * 8), 1)); }
+    .inst.i3 { opacity: calc(var(--inst-peak) * clamp(0, min((var(--scroll) - 0.52) * 8, (0.88 - var(--scroll)) * 8), 1)); }
+    .inst.i4 { opacity: calc(var(--inst-peak) * clamp(0, (var(--scroll) - 0.78) * 8, 1)); }
     .playhead { top: calc(var(--scroll) * 100%); }
   }
 }
@@ -333,8 +342,8 @@ footer .sp { flex: 1; }
 /* Reduced motion keeps the arrangement and drops the performance: lanes
    rest at a quiet opacity, nothing moves, no playhead is drawn. */
 @media (prefers-reduced-motion: reduce) {
-  .lane.l1, .lane.l2, .lane.l3 { opacity: 0.07; }
-  .inst.i1, .inst.i4 { opacity: 0.05; }
+  .lane.l1, .lane.l2, .lane.l3 { opacity: var(--lane-rest); }
+  .inst.i1, .inst.i4 { opacity: var(--inst-rest); }
 }
 
 /* The line that tells a first-time visitor what they are looking at.
@@ -343,4 +352,109 @@ footer .sp { flex: 1; }
 .kicker {
   font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.2em;
   text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem;
+}
+
+
+/* ============================================================
+   Phones.
+
+   Everything above is written for a page with room in it. A phone has a
+   third of the width, a fifth of the area, and is usually being read
+   one-handed in worse light — so several things that are fine at desk
+   size are wrong here, and each needs its own answer rather than a
+   global shrink.
+   ============================================================ */
+
+@media (max-width: 46rem) {
+
+  /* The background was almost invisible. Two causes compounding: the
+     instruments are sized in vw, so a shape 300px across on a laptop is
+     90px on a phone, and the same opacity carries far less on a small
+     bright screen. Bigger and louder — an abstract line drawing at half
+     the viewport reads as deliberate, where the same thing small reads
+     as a smudge. */
+  :root {
+    --lane-peak: 0.30;
+    --lane-rest: 0.14;
+    --inst-peak: 0.15;
+    --inst-rest: 0.10;
+  }
+
+  .inst { width: clamp(13rem, 62vw, 24rem); }
+  .inst.i1 { top: 16vh; right: -8vw; }
+  .inst.i2 { top: 34vh; left: -12vw; }
+  .inst.i3 { top: 46vh; right: -14vw; }
+  .inst.i4 { top: 30vh; left: -10vw; }
+
+  /* Lanes spread across the height instead of bunching in the middle
+     third, which is what they did on a tall screen. */
+  .lane { height: 12vh; }
+  .lane.l1 { top: 18vh; }
+  .lane.l2 { top: 43vh; }
+  .lane.l3 { top: 68vh; }
+
+  /* The header wrapped into a jumble: brand, four nav items, a flexible
+     spacer and a button, all fighting for one row. Two clean rows
+     instead — who this is, then where to go. The button leaves; it is
+     already at the bottom of every page, and the nav matters more here. */
+  header.top { display: block; padding: 1.25rem 0 0.75rem; }
+  header.top .cta, header.top .sp { display: none; }
+  .brand { display: block; margin-bottom: 0.9rem; }
+  nav.pages {
+    gap: 1.35rem;
+    font-size: 0.9rem;
+    padding-bottom: 0.25rem;
+  }
+
+  /* Tighter gutters and less air between sections. 72px of vertical
+     padding is generous on a laptop and a chasm on a phone, where it
+     separates things that belong together. */
+  .wrap { padding: 0 1.25rem; }
+  .hero { padding: 2.5rem 0 3rem; }
+  .hero p { margin-top: 1.25rem; max-width: 24ch; }
+  .meta { margin-top: 1.75rem; }
+  section.moment { padding: 3.25rem 0; }
+  section.moment .lede { margin-top: 1.1rem; }
+  .art { margin-top: 1.75rem; padding: 1rem; }
+  .close { padding: 3.5rem 0 2.5rem; }
+  .kicker { margin-bottom: 1.1rem; }
+
+  /* Headlines were set to wrap at 18ch, which on a narrow column left
+     ragged one-word lines. Let them use the width they have. */
+  section.moment h2 { max-width: none; font-size: clamp(1.7rem, 8vw, 2.4rem); }
+  .hero h1 { font-size: clamp(2.6rem, 14vw, 4rem); }
+  .hero.inner h1 { font-size: clamp(2rem, 10vw, 2.9rem); }
+
+  /* A take row ran out of width: a 136px fixed name, a percentage
+     column and a fader all in one line left the fader a stub. Name on
+     its own line, fader full width under it. */
+  .take { flex-wrap: wrap; gap: 0.5rem 0.7rem; padding: 0.75rem 0; }
+  .take .name { min-width: 0; flex: 1; }
+  .take .pct { min-width: 0; }
+  .take .fader { flex-basis: 100%; order: 3; }
+
+  /* Three big numbers per row does not fit. Two do. */
+  .stats { gap: 1.25rem 2rem; }
+  .stat { flex: 1 1 40%; }
+  .stat .v { font-size: 1.45rem; }
+
+  /* The song's shape is a row of eight labels; on a phone the words do
+     not fit their blocks. It scrolls sideways at a readable size rather
+     than compressing into initials nobody can read. */
+  .form { overflow-x: auto; gap: 2px; }
+  .form span { flex: none; min-width: 4.25rem; }
+
+  .lyric em { font-size: 1rem; }
+  .lyric .chords { padding-left: 0; }
+
+  footer { gap: 0.4rem 1rem; }
+  footer .sp { flex-basis: 100%; }
+}
+
+/* Very narrow phones. One extra step rather than a smaller everything:
+   only the things that actually break get another value. */
+@media (max-width: 22rem) {
+  .wrap { padding: 0 1rem; }
+  nav.pages { gap: 1rem; font-size: 0.85rem; }
+  .stat { flex-basis: 100%; }
 }
