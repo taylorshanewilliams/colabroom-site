@@ -205,6 +205,9 @@ section.moment .more {
   letter-spacing: 0.06em;
 }
 
+/* Numbers and shape in one picture: what came back, and how it is laid out. */
+.art .stats + .form { margin-top: 1.75rem; }
+
 /* A song's shape, as the analyzer reports it. */
 .form { display: flex; gap: 3px; margin-top: 0.25rem; }
 .form span {
