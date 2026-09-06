@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What chords is this? — CoLabRoom</title>
+<meta name="description" content="Drop in a recording and get the chords back. No account, nothing to install, and your audio is never stored.">
+<meta property="og:title" content="What chords is this?">
+<meta property="og:description" content="Drop in a recording and get the chords back. No account. Your audio is never stored.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <a class="brand" href="index.html">CoLabRoom</a>
+    <nav class="pages">
+      <a href="chords.html" aria-current="page">Chords</a>
+      <a href="takes.html">Studio</a>
+      <a href="analysis.html">Control Room</a>
+      <a href="songbook.html">Song sheet</a>
+      <a href="bands.html">Your band</a>
+    </nav>
+    <span class="sp"></span>
+    <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta">Email for an invite</a>
+  </header>
+
+  <div class="hero">
+    <p class="kicker">Free, and there is nothing to sign up for</p>
+    <h1>What chords<br>is this?</h1>
+    <p>Drop in a recording. Get the chords back in about a minute.</p>
+    <div class="meta">Nothing is stored · Five songs a day</div>
+  </div>
+
+  <!-- The tool.
+
+       Deliberately the first thing on the page rather than the third. Somebody
+       who arrived here searching "chords from a song" has a question, and a
+       page that answers it before explaining itself is a page they finish. -->
+  <section class="tool" id="tool">
+    <form id="drop" class="drop" aria-label="Upload a recording">
+      <input type="file" id="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.flac,.ogg" hidden>
+      <div class="drop-inner">
+        <div class="drop-mark" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <p class="drop-lead">Drop a song here</p>
+        <p class="drop-sub">or <button type="button" class="linkish" id="pick">choose a file</button> — mp3, wav, m4a, up to 24MB</p>
+      </div>
+    </form>
+
+    <div class="working" id="working" hidden>
+      <div class="bar"><i></i></div>
+      <p id="working-note">Listening…</p>
+    </div>
+
+    <div class="problem" id="problem" hidden role="alert"></div>
+
+    <div class="result" id="result" hidden>
+      <div class="result-head">
+        <div>
+          <p class="result-label">Key, estimated</p>
+          <p class="result-key" id="key">—</p>
+        </div>
+        <div>
+          <p class="result-label">Progression</p>
+          <p class="result-prog" id="prog">—</p>
+        </div>
+      </div>
+
+      <div class="chart" id="chart"></div>
+
+      <div class="result-foot">
+        <button type="button" class="cta quiet" id="copy">Copy the chords</button>
+        <button type="button" class="cta quiet" id="again">Try another song</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="moment reveal">
+    <div class="eyebrow">Why it is free</div>
+    <h2>Because it is the cheap half.</h2>
+    <p class="lede">
+      Finding chords is a few seconds of ordinary computing. Splitting a song
+      into its instruments is not — that is the part that costs, and that is
+      the part the app does. This page runs the first half and nothing else,
+      which is why it can be free and why the key above is an estimate rather
+      than a measurement.
+    </p>
+  </section>
+
+  <section class="moment reveal">
+    <div class="eyebrow">Your recording</div>
+    <h2>We do not keep it.</h2>
+    <p class="lede">
+      The audio is read, listened to, and dropped. There is no account, no
+      upload folder, and no copy on a server afterwards — which is not a
+      promise about our conduct so much as a description of how this is built.
+      Nothing was written down, so there is nothing to delete.
+    </p>
+  </section>
+
+  <nav class="onwards">
+    <div class="onward-grid">
+      <a class="onward" href="songbook.html">
+        <span class="where">The song sheet</span>
+        <span class="what">Chords over the words, in your key.</span>
+      </a>
+      <a class="onward" href="takes.html">
+        <span class="where">The Studio</span>
+        <span class="what">Play over it. Everybody does.</span>
+      </a>
+      <a class="onward" href="index.html">
+        <span class="where">CoLabRoom</span>
+        <span class="what">Songwriting for bands who aren't in the same room.</span>
+      </a>
+    </div>
+  </nav>
+
+  <footer>
+    <span>CoLabRoom — songwriting for bands</span>
+    <span class="sp"></span>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </footer>
+
+</div>
+
+<script src="chords.js"></script>
+<script src="reveal.js"></script>
+</body>
+</html>

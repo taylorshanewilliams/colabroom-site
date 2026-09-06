@@ -535,3 +535,176 @@ footer .sp { flex: 1; }
   nav.pages { gap: 1rem; font-size: 0.85rem; }
   .stat { flex-basis: 100%; }
 }
+
+/* ---------------------------------------------------------------------
+   The free chord tool (chords.html)
+   ---------------------------------------------------------------------
+   The one page on this site that does something rather than describing
+   something. It borrows the same tokens as everything else so it reads as
+   part of the app rather than as a widget somebody embedded. */
+
+.tool { margin: 0 0 4.5rem; }
+
+.drop {
+  display: block;
+  width: 100%;
+  border: 1px dashed var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  padding: 3rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+.drop:hover, .drop.over { border-color: var(--cyan); background: #0C1D33; }
+.drop:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+.drop-lead {
+  font-family: var(--display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 .35rem;
+}
+.drop-sub { color: var(--muted); font-size: .9375rem; }
+
+/* Five bars, the shape of the app's own take rows. Still, not animated:
+   a drop zone that moves before anybody has dropped anything is a page
+   asking for attention it has not earned yet. */
+.drop-mark {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  height: 34px;
+  margin: 0 0 1.1rem;
+}
+.drop-mark span {
+  width: 5px;
+  border-radius: 3px;
+  background: var(--cyan);
+  opacity: .55;
+}
+.drop-mark span:nth-child(1) { height: 40%; }
+.drop-mark span:nth-child(2) { height: 78%; }
+.drop-mark span:nth-child(3) { height: 100%; }
+.drop-mark span:nth-child(4) { height: 62%; }
+.drop-mark span:nth-child(5) { height: 30%; }
+
+.linkish {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--cyan);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.working { margin-top: 1.5rem; text-align: center; color: var(--muted); }
+.working .bar {
+  height: 3px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+  margin-bottom: .75rem;
+}
+/* Indeterminate on purpose. The endpoint cannot say how far through it is,
+   and a bar that pretends to know is a bar that sits at 90% for forty
+   seconds. */
+.working .bar i {
+  display: block;
+  height: 100%;
+  width: 38%;
+  border-radius: 3px;
+  background: var(--cyan);
+  animation: slide 1.4s ease-in-out infinite;
+}
+@keyframes slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .working .bar i { animation: none; width: 100%; opacity: .5; }
+}
+
+.problem {
+  margin-top: 1.5rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--body);
+  font-size: .9375rem;
+}
+
+.result { margin-top: 1.75rem; }
+
+.result-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 3rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+.result-label {
+  font-family: var(--mono);
+  font-size: .625rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 .3rem;
+}
+.result-key {
+  font-family: var(--display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+.result-prog {
+  font-family: var(--display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--cyan);
+  margin: 0;
+}
+
+.chart {
+  margin: 1.25rem 0 1.5rem;
+  max-height: 26rem;
+  overflow-y: auto;
+}
+.chart-row {
+  display: grid;
+  grid-template-columns: 4rem 1fr 3.5rem;
+  align-items: baseline;
+  gap: 1rem;
+  padding: .55rem 0;
+  border-bottom: 1px solid rgba(22, 48, 79, .55);
+}
+.chart-at, .chart-held {
+  font-family: var(--mono);
+  font-size: .75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.chart-held { text-align: right; }
+.chart-chord {
+  font-family: var(--display);
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.chart-chord.quiet { color: var(--muted); font-weight: 500; }
+
+.result-foot { display: flex; flex-wrap: wrap; gap: .75rem; }
+
+@media (max-width: 40rem) {
+  .drop { padding: 2.25rem 1rem; }
+  .result-key { font-size: 1.6rem; }
+  .result-prog { font-size: 1.15rem; }
+  .chart-row { grid-template-columns: 3.25rem 1fr 3rem; gap: .75rem; }
+}

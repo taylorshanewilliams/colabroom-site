@@ -243,6 +243,28 @@
     this app.
   </p>
 
+  <h2>The chord tool on this website</h2>
+  <p>
+    The <a href="chords.html">chord tool</a> takes an audio file, works out the
+    chords, and sends them back. It does not require an account and does not
+    create one.
+  </p>
+  <p>
+    <strong style="color: var(--text)">The recording is never stored.</strong>
+    It is held in memory for as long as the analysis takes, passed to the chord
+    detector, and dropped. There is no upload folder, no database row, and no
+    copy afterwards — so there is nothing to delete, and nothing for us to hand
+    over if anybody ever asked.
+  </p>
+  <p>
+    One thing is kept, and only to stop the tool being used to run up a bill:
+    a <em>salted hash</em> of the network address the request came from, with a
+    count of how many songs it has sent today. Not the address itself, and not
+    anything about the music. Those rows are deleted after a day. They can
+    answer exactly one question — whether this requester has had its five songs
+    today — and no other.
+  </p>
+
   <h2>How long we keep it</h2>
   <p>
     Until you delete it or delete your account. There's currently no
