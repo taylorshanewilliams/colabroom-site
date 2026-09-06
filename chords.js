@@ -24,6 +24,8 @@ const progEl = document.getElementById('prog');
 const chart = document.getElementById('chart');
 const copyBtn = document.getElementById('copy');
 const againBtn = document.getElementById('again');
+const gate = document.getElementById('gate');
+const gateBack = document.getElementById('gate-back');
 
 /* Harte notation into what a musician writes.
 
@@ -161,6 +163,7 @@ async function send(file) {
 
   show(problem, false);
   show(result, false);
+  show(gate, false);
   show(working, true);
   workingNote.textContent = 'Listening…';
 
@@ -186,6 +189,19 @@ async function send(file) {
     const body = await response.json().catch(() => null);
 
     if (!response.ok) {
+      // The limit is not a failure and must not look like one. Somebody who
+      // has used their free songs has shown the only thing worth knowing
+      // about them — they have music and they want to know what is in it —
+      // and greeting that with a red error box is the wrong answer to the
+      // best moment this page gets.
+      if (body && body.limit_reached) {
+        show(working, false);
+        show(result, false);
+        show(problem, false);
+        show(gate, true);
+        gate.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
       fail(
         (body && body.error) ||
           'That did not work. Try again in a moment.'
@@ -236,6 +252,11 @@ copyBtn.addEventListener('click', async () => {
   } catch (error) {
     copyBtn.textContent = 'Select and copy above';
   }
+});
+
+gateBack.addEventListener('click', () => {
+  show(gate, false);
+  document.getElementById('tool').scrollIntoView({ behavior: 'smooth' });
 });
 
 againBtn.addEventListener('click', () => {

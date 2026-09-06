@@ -31,17 +31,13 @@
   </header>
 
   <div class="hero">
-    <p class="kicker">Free, and there is nothing to sign up for</p>
     <h1>What chords<br>is this?</h1>
-    <p>Drop in a recording. Get the chords back in about a minute.</p>
-    <div class="meta">Nothing is stored · Five songs a day</div>
+    <p>Drop in a song. Get the chords back.</p>
+    <div class="meta">Free · No account · We never keep your recording</div>
   </div>
 
-  <!-- The tool.
-
-       Deliberately the first thing on the page rather than the third. Somebody
-       who arrived here searching "chords from a song" has a question, and a
-       page that answers it before explaining itself is a page they finish. -->
+  <!-- First thing on the page, because somebody who arrived searching for
+       chords has a question. -->
   <section class="tool" id="tool">
     <form id="drop" class="drop" aria-label="Upload a recording">
       <input type="file" id="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.flac,.ogg" hidden>
@@ -60,6 +56,25 @@
     </div>
 
     <div class="problem" id="problem" hidden role="alert"></div>
+
+    <!-- Where the free tool stops and the app starts.
+
+         Not an error, and styled so it does not read as one. Somebody who has
+         used their free songs has demonstrated the only thing worth knowing
+         about them: they have music and they want to know what is in it. That
+         is the moment to ask, and it is the only moment on this page that has
+         earned the right to. -->
+    <div class="gate" id="gate" hidden>
+      <p class="gate-lead">That is your free songs for today.</p>
+      <p class="gate-sub">
+        The app has no daily limit — and it keeps the chords with the song,
+        puts them over the words, and lets your band play on it.
+      </p>
+      <div class="gate-actions">
+        <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta&amp;body=I%20used%20the%20chord%20tool%20and%20would%20like%20the%20app.">Get the app</a>
+        <button type="button" class="cta quiet" id="gate-back">Back to the tool</button>
+      </div>
+    </div>
 
     <div class="result" id="result" hidden>
       <div class="result-head">
@@ -82,28 +97,11 @@
     </div>
   </section>
 
-  <section class="moment reveal">
-    <div class="eyebrow">Why it is free</div>
-    <h2>Because it is the cheap half.</h2>
-    <p class="lede">
-      Finding chords is a few seconds of ordinary computing. Splitting a song
-      into its instruments is not — that is the part that costs, and that is
-      the part the app does. This page runs the first half and nothing else,
-      which is why it can be free and why the key above is an estimate rather
-      than a measurement.
-    </p>
-  </section>
-
-  <section class="moment reveal">
-    <div class="eyebrow">Your recording</div>
-    <h2>We do not keep it.</h2>
-    <p class="lede">
-      The audio is read, listened to, and dropped. There is no account, no
-      upload folder, and no copy on a server afterwards — which is not a
-      promise about our conduct so much as a description of how this is built.
-      Nothing was written down, so there is nothing to delete.
-    </p>
-  </section>
+  <!-- Two sections explaining why the tool is free and what happens to the
+       audio used to live here. Both were true and both were unnecessary: a
+       page that justifies itself before it has been used reads as defensive,
+       and nobody arriving with a song wants an essay first. What survived is
+       the line under the hero and a line in the result. -->
 
   <nav class="onwards">
     <div class="onward-grid">

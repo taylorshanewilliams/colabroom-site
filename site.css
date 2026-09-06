@@ -708,3 +708,38 @@ footer .sp { flex: 1; }
   .result-prog { font-size: 1.15rem; }
   .chart-row { grid-template-columns: 3.25rem 1fr 3rem; gap: .75rem; }
 }
+
+/* Where the free tool stops and the app starts.
+
+   Styled as an offer, not an error. The .problem panel above uses a gold
+   left-edge and reads as something going wrong; this shares none of that
+   language on purpose, because somebody who has used their free songs has
+   just demonstrated they have music and want to know what is in it. That is
+   the best moment this page gets and it should not look like a fault. */
+.gate {
+  margin-top: 1.75rem;
+  padding: 2rem 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #0C1D33 0%, var(--surface) 100%);
+  text-align: center;
+}
+.gate-lead {
+  font-family: var(--display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 .5rem;
+}
+.gate-sub {
+  color: var(--body);
+  font-size: .9375rem;
+  max-width: 34rem;
+  margin: 0 auto 1.5rem;
+}
+.gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  justify-content: center;
+}
