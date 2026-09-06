@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CoLabRoom Copyright &amp; Takedown</title>
+<meta name="description" content="How to report copyright infringement on CoLabRoom, what a notice must contain, and how to answer one.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  :root {
+    --ink: #050B16;
+    --surface: #0A1728;
+    --line: #16304F;
+    --line-soft: #102743;
+    --text: #F2F7FF;
+    --body: #C6D3E8;
+    --muted: #8A9AB6;
+    --cyan: #3AD3FF;
+    --gold: #E3B34D;
+
+    --display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --measure: 38rem;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--body);
+    font-family: var(--serif);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  a { color: var(--cyan); }
+  a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+  .page {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: clamp(2.5rem, 6vw, 4.5rem) 1.25rem 5rem;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 2.5rem;
+  }
+  .back:hover { color: var(--cyan); }
+
+  h1 {
+    font-family: var(--display);
+    color: var(--text);
+    font-size: clamp(1.9rem, 1.5rem + 1.8vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    margin: 0 0 0.6rem;
+  }
+
+  .updated {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin: 0 0 2.75rem;
+  }
+
+  .notice {
+    font-size: 0.94rem;
+    color: var(--muted);
+    border-left: 2px solid var(--gold);
+    padding-left: 1rem;
+    margin-bottom: 3rem;
+    max-width: var(--measure);
+  }
+
+  h2 {
+    font-family: var(--display);
+    color: var(--text);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.008em;
+    margin: 3rem 0 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-soft);
+  }
+  h2:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+
+  h3 {
+    font-family: var(--display);
+    color: var(--text);
+    font-size: 0.98rem;
+    font-weight: 700;
+    margin: 1.6rem 0 0.5rem;
+  }
+
+  p { margin: 0 0 1.05rem; max-width: var(--measure); }
+
+  ul, ol { margin: 0 0 1.05rem; padding-left: 1.25rem; max-width: var(--measure); }
+  li { margin-bottom: 0.5rem; }
+
+  .table {
+    border: 1px solid var(--line-soft);
+    border-radius: 0.6rem;
+    overflow: hidden;
+    margin: 0 0 1.3rem;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 0.25rem 1rem;
+    padding: 0.75rem 0.9rem;
+    background: var(--surface);
+    font-size: 0.94rem;
+  }
+  .row + .row { border-top: 1px solid var(--line-soft); }
+  .row .who {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  @media (max-width: 34rem) {
+    .row { grid-template-columns: 1fr; }
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    color: var(--text);
+    background: var(--surface);
+    padding: 0.1em 0.35em;
+    border-radius: 0.3em;
+  }
+
+  footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--cyan); }
+</style>
+</head><body>
+<div class="page">
+
+  <a class="back" href="/">← CoLabRoom</a>
+
+  <h1>Copyright &amp; takedown</h1>
+  <p class="updated">Last updated September 6, 2026</p>
+
+  <p class="notice">
+    CoLabRoom is published by <strong style="color: var(--text)">Decibel Zero LLC</strong>.
+    If something on CoLabRoom uses your work without permission, this page tells
+    you exactly how to have it removed, what a notice has to contain to be
+    acted on, and what happens next. If you are the person whose work was
+    removed, the counter-notice section is for you.
+  </p>
+
+  <h2>What we do and don't host</h2>
+  <p>
+    CoLabRoom stores recordings that people upload to their own catalogs, and
+    generates chord charts and lyric transcriptions from them. That means a
+    recording somebody uploads is stored on our servers, and we will act on a
+    valid notice about it.
+  </p>
+  <p>
+    The <a href="chords.html">chord tool on this website</a> is different and
+    worth stating plainly: <strong style="color: var(--text)">it stores
+    nothing</strong>. Audio sent to it is held in memory for as long as the
+    analysis takes and then dropped. There is no upload folder, no database
+    row, and no copy afterwards — so there is nothing there to remove.
+  </p>
+  <p>
+    Chord charts themselves are not copies of a recording. A chord progression
+    is not protected expression, and a chart describing one is not a
+    reproduction of the song it describes. Lyrics are a different matter, and
+    a notice about transcribed lyrics is one we will act on.
+  </p>
+
+  <h2>Sending a notice</h2>
+  <p>
+    Send it to our designated agent. Under 17 U.S.C. §512(c)(3) a notice has to
+    contain all six of the following, and one that is missing pieces may not be
+    something we can act on:
+  </p>
+  <ol>
+    <li>A physical or electronic signature of the copyright owner, or somebody
+      authorised to act for them.</li>
+    <li>Identification of the copyrighted work you say has been infringed.</li>
+    <li>Identification of the material you want removed, and
+      <strong style="color: var(--text)">enough detail for us to find it</strong>
+      — a link, a song title, a username, or all three.</li>
+    <li>Your contact details: address, telephone number, and email.</li>
+    <li>A statement that you have a good faith belief the use is not authorised
+      by the copyright owner, its agent, or the law.</li>
+    <li>A statement that the information in the notice is accurate, and
+      <em>under penalty of perjury</em>, that you are authorised to act on
+      behalf of the owner.</li>
+  </ol>
+
+  <div class="table">
+    <div class="row">
+      <span class="who">Agent</span>
+      <span>DMCA Agent, Decibel Zero LLC</span>
+    </div>
+    <div class="row">
+      <span class="who">Email</span>
+      <span><a href="mailto:dmca@colabroom.com">dmca@colabroom.com</a></span>
+    </div>
+    <div class="row">
+      <span class="who">Post</span>
+      <span>Registration with the U.S. Copyright Office is in progress. Until it
+        completes, email reaches us fastest and is answered the same way.</span>
+    </div>
+  </div>
+
+  <p>
+    You can also report something from inside the app — open the profile, song
+    or recording, choose <strong style="color: var(--text)">Report</strong>, and
+    pick <em>It uses music that is not theirs</em>. That reaches the same place.
+    It is not a substitute for a formal notice if you need one on the record,
+    but it is faster and it works from a phone.
+  </p>
+
+  <h2>What we do with it</h2>
+  <ol>
+    <li>We read it. A person reads every one — there is no queue that only a
+      script looks at.</li>
+    <li>If it is valid, we remove or disable access to the material promptly.</li>
+    <li>We tell the person who uploaded it what was removed and why, and we
+      pass on your notice.</li>
+    <li>We tell them they can send a counter-notice, and how.</li>
+  </ol>
+  <p>
+    We keep a record of notices and what we did about them. That record is what
+    the repeat infringer policy below runs on.
+  </p>
+
+  <h2>Answering a notice about your work</h2>
+  <p>
+    If your material was removed and you believe that was a mistake — you own
+    it, you licensed it, or the use is lawful — you can send a counter-notice to
+    the same address. Under §512(g)(3) it needs:
+  </p>
+  <ol>
+    <li>Your physical or electronic signature.</li>
+    <li>Identification of what was removed and where it was before removal.</li>
+    <li>A statement <em>under penalty of perjury</em> that you have a good faith
+      belief it was removed as a result of mistake or misidentification.</li>
+    <li>Your name, address and telephone number, and a statement that you
+      consent to the jurisdiction of the federal court for your district — or,
+      if you are outside the United States, of any district where we may be
+      found — and that you will accept service from the person who sent the
+      original notice.</li>
+  </ol>
+  <p>
+    We will forward it to whoever sent the notice. If they do not tell us within
+    10 business days that they have filed a court action, we may restore the
+    material.
+  </p>
+  <p class="notice" style="border-color: var(--cyan)">
+    Both a notice and a counter-notice are sworn statements. Knowingly
+    misrepresenting that material is infringing — or that it was removed by
+    mistake — carries liability for damages under §512(f). This is not a form to
+    fill in casually in either direction.
+  </p>
+
+  <h2>Repeat infringers</h2>
+  <p>
+    We terminate the accounts of people who repeatedly infringe. In practice:
+  </p>
+  <ul>
+    <li>A valid notice we act on is recorded against the account that uploaded
+      the material.</li>
+    <li>A second one gets a written warning that the next will end the account.</li>
+    <li>A third ends it. The person is told, and they can retrieve their own
+      original work before it closes.</li>
+  </ul>
+  <p>
+    A notice that is successfully answered by a counter-notice does not count.
+    Neither does one we decide is invalid. We can act sooner than three where
+    the infringement is flagrant — uploading a commercial catalogue, for
+    instance, is not a strike-counting situation.
+  </p>
+
+  <h2>What we ask of you</h2>
+  <p>
+    Nothing on this page changes the simplest version, which is in the
+    <a href="terms.html">Terms</a>: don't upload work you don't have the rights
+    to. Working out the chords of a song you love is one thing. Putting somebody
+    else's record into a shared catalog, or publishing their lyrics, is another,
+    and it is the sort of thing that ends accounts.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Decibel Zero LLC — <a href="mailto:dmca@colabroom.com">dmca@colabroom.com</a>
+    for copyright, <a href="mailto:support@colabroom.com">support@colabroom.com</a>
+    for everything else.
+  </p>
+
+  <footer>
+    <a href="/">CoLabRoom</a> · <a href="/terms.html">Terms of Service</a> · <a href="/privacy.html">Privacy</a>
+  </footer>
+
+</div>
+</body>
+</html>
