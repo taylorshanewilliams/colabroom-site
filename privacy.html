@@ -169,7 +169,7 @@
   <a class="back" href="/">← CoLabRoom</a>
 
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated August 24, 2026 · Effective for the CoLabRoom beta</p>
+  <p class="updated">Last updated September 6, 2026</p>
 
   <p class="notice">
     CoLabRoom is published by <strong style="color: var(--text)">Decibel Zero LLC</strong>
@@ -220,13 +220,17 @@
     <div class="row"><span class="who">Supabase</span><span>Stores the recording, your account data, and every song in the app. Our database and file storage provider.</span></div>
     <div class="row"><span class="who">RunPod</span><span>Runs our own instrument-separation code on their GPUs, to split the recording into stems.</span></div>
     <div class="row"><span class="who">Google Cloud Run</span><span>Runs our own chord-detection code, to work out what's being played.</span></div>
-    <div class="row"><span class="who">OpenAI</span><span>If there's singing, the isolated vocal — not the full mix — is sent to OpenAI's transcription API to work out the words. Governed by <a href="https://openai.com/policies/api-data-usage-policies" target="_blank" rel="noopener">OpenAI's own API data terms</a>.</span></div>
+    <div class="row"><span class="who">RunPod</span><span>Also transcribes the words for a song sheet. That runs on the same worker as the separation, on our own code — the vocal does not leave that machine.</span></div>
+    <div class="row"><span class="who">OpenAI</span><span>Used for the shorter path only: voice notes, and recordings you transcribe from the Studio. The isolated vocal — not the full mix — goes to OpenAI's transcription API. Governed by <a href="https://openai.com/policies/api-data-usage-policies" target="_blank" rel="noopener">OpenAI's own API data terms</a>.</span></div>
+    <div class="row"><span class="who">Apple or Google</span><span>If you dictate lyrics rather than type them, the phone's own speech recogniser is used, and on iOS that may send what you say to Apple. It's the system feature, not ours, and it only runs while you're dictating.</span></div>
   </div>
   <p>
     RunPod and Google Cloud Run are infrastructure we run our own code on —
-    they don't process your recording for their own purposes. OpenAI is the
-    one genuine third party in this chain, and it only ever receives the
-    isolated vocal, only when you ask for lyric analysis.
+    they don't process your recording for their own purposes. Making a song
+    sheet no longer sends anything to OpenAI: transcription moved onto the
+    analysis worker, where it is both more accurate and ours. OpenAI still
+    receives the isolated vocal on the shorter path — a voice note, or a
+    Studio recording you ask for words from — and never the full mix.
   </p>
   <p>
     Analyses are cached by the recording's fingerprint: the exact same audio
