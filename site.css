@@ -770,3 +770,39 @@ footer .sp { flex: 1; }
   gap: .75rem;
   justify-content: center;
 }
+
+/* ---------------------------------------------------------------------
+   The generated pages: one song, or one musician.
+   --------------------------------------------------------------------- */
+
+/* These are the only pages on this site somebody arrives at cold, from a
+   search result or a link somebody sent them — every other page is reached
+   from the one before it. So they lead with the thing itself and carry the
+   least chrome of anything here. */
+.page { padding: 3rem 0 4rem; max-width: 42rem; }
+.page h1 {
+  font-family: var(--display); font-weight: 800;
+  font-size: clamp(2.1rem, 7vw, 3.4rem); line-height: 1.02;
+  letter-spacing: -0.03em; margin: 0.6rem 0 0.9rem;
+  text-wrap: balance;
+}
+
+.facts {
+  list-style: none; padding: 0; margin: 2rem 0 0;
+  border-top: 1px solid var(--line);
+}
+.facts li {
+  display: flex; gap: 1rem; align-items: baseline;
+  padding: 0.8rem 0; border-bottom: 1px solid var(--line);
+}
+.facts span {
+  font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  flex: 0 0 8.5rem;
+}
+.facts b { font-weight: 600; }
+
+.note {
+  margin-top: 2.2rem; color: var(--muted);
+  font-size: 0.95rem; line-height: 1.6;
+}

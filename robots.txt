@@ -8,3 +8,7 @@ User-agent: *
 Allow: /
 
 Sitemap: https://colabroom.com/sitemap.xml
+# The generated half: one page per showcased song and per discoverable
+# musician. Kept separate so a bad generator run can never take the
+# hand-written pages down with it.
+Sitemap: https://colabroom.com/sitemap-pages.xml
