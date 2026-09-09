@@ -1,0 +1,10 @@
+# colabroom.com
+#
+# Everything here is public by design: what the app does, and the legal pages.
+# The song and profile pages that will sit alongside these are generated from
+# rows their authors explicitly published, and nothing else is ever written to
+# this domain.
+User-agent: *
+Allow: /
+
+Sitemap: https://colabroom.com/sitemap.xml
