@@ -481,11 +481,24 @@ footer .sp { flex: 1; }
   .lane.l3 { top: 68vh; }
 
   /* The header wrapped into a jumble: brand, four nav items, a flexible
-     spacer and a button, all fighting for one row. Two clean rows
-     instead — who this is, then where to go. The button leaves; it is
-     already at the bottom of every page, and the nav matters more here. */
+     spacer and a button, all fighting for one row. Clean rows instead —
+     who this is, then where to go, then what to do.
+
+     The buttons used to leave entirely here, on the reasoning that the
+     one button was already at the bottom of every page. That was true of
+     the invite ask and never became true of Sign in, which exists on no
+     other page — so on a phone, which is most of the traffic, somebody
+     with an account had no way into the app from six of these pages.
+     They stay, smaller, on a row of their own. */
   header.top { display: block; padding: 1.25rem 0 0.75rem; }
-  header.top .cta, header.top .sp { display: none; }
+  header.top .sp { display: none; }
+  header.top .cta {
+    display: inline-block;
+    margin-top: 0.9rem;
+    font-size: 0.8rem;
+    padding: 0.45rem 0.9rem;
+  }
+  header.top .cta.quiet { margin-right: 0.45rem; }
   .brand { display: block; margin-bottom: 0.9rem; }
   nav.pages {
     gap: 1.35rem;
