@@ -84,6 +84,20 @@ header.top .sp { flex: 1; }
 }
 .cta.quiet { background: transparent; color: var(--cyan); border: 1px solid var(--line); }
 
+/* The one action on the front page that needs nothing from anybody.
+   Wraps rather than shrinks: at 22rem the button and its note sit on
+   two lines, which is better than a button with no room for its
+   own words. */
+.hero-do {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 0.6rem 1rem; margin-top: 1.6rem;
+}
+.hero-note {
+  font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+
 .meta {
   font-family: var(--mono); font-size: 0.72rem; color: var(--muted);
   letter-spacing: 0.08em; margin-top: 2.5rem;
