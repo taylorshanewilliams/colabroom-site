@@ -44,13 +44,20 @@ const gate = document.getElementById('gate');
    `keepalive` matters on the ones that precede a navigation: without
    it, following a link cancels the request that was recording that the
    link was followed.
+
+   **A GET, deliberately, for a call that changes a number.** The live
+   function treats every POST as an audio upload and claims a slot from
+   the daily quota *before* it looks at the body — so a POST beacon
+   shipped a moment before the function is redeployed would spend one of
+   a visitor's five free songs on loading the page. It refuses anything
+   that is not a POST first, without touching the quota, which makes GET
+   the one shape that is harmless against both the old deployment and
+   the new one. Correctness under a version skew beats REST here.
    ------------------------------------------------------------------ */
 function note(step) {
   try {
-    fetch(ENDPOINT + '/note', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ step }),
+    fetch(ENDPOINT + '/note?step=' + encodeURIComponent(step), {
+      cache: 'no-store',
       keepalive: true,
     }).catch(() => {});
   } catch (_) {
