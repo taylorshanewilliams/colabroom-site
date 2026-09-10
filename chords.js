@@ -23,6 +23,7 @@ const keyEl = document.getElementById('key');
 const progEl = document.getElementById('prog');
 const chart = document.getElementById('chart');
 const copyBtn = document.getElementById('copy');
+const shareBtn = document.getElementById('share');
 const againBtn = document.getElementById('again');
 const gate = document.getElementById('gate');
 const gateBack = document.getElementById('gate-back');
@@ -51,6 +52,70 @@ const QUALITIES = {
   min9: 'm9',
   maj9: 'maj9',
 };
+
+/* ------------------------------------------------------------------
+   A link that carries the chart, and stores nothing anywhere.
+
+   The whole sheet is packed into the URL fragment. That is a deliberate
+   choice over saving it on the server and handing back a short id:
+
+     * Nothing is stored, so there is nothing to moderate, nothing to
+       retain, nothing to delete on request, and no cost per share. A
+       tool that hosts what strangers upload is a different product with
+       a different legal surface.
+     * A fragment never reaches the server at all — browsers do not send
+       it — so a shared chart is private between whoever has the link.
+     * It cannot rot. There is no row to expire and no cleanup job.
+
+   The cost is a long URL. Deflate plus base64url keeps a normal song
+   inside two thousand characters, which every browser and messaging app
+   handles without complaint.
+   ------------------------------------------------------------------ */
+let lastSheet = null;
+
+const b64 = {
+  to(bytes) {
+    let out = '';
+    for (const b of bytes) out += String.fromCharCode(b);
+    return btoa(out).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  },
+  from(text) {
+    const padded = text.replace(/-/g, '+').replace(/_/g, '/');
+    const raw = atob(padded + '==='.slice((padded.length + 3) % 4));
+    const bytes = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i += 1) bytes[i] = raw.charCodeAt(i);
+    return bytes;
+  },
+};
+
+async function squeeze(bytes, mode) {
+  /* CompressionStream is in every current browser and absent from a few
+     older ones. Where it is missing the link is simply longer, rather
+     than the feature being missing. */
+  const Ctor = mode === 'in'
+    ? globalThis.CompressionStream
+    : globalThis.DecompressionStream;
+  if (!Ctor) return null;
+  try {
+    const stream = new Blob([bytes]).stream().pipeThrough(new Ctor('deflate-raw'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  } catch (_) {
+    return null;
+  }
+}
+
+async function packSheet(sheet) {
+  const raw = new TextEncoder().encode(JSON.stringify(sheet));
+  const squeezed = await squeeze(raw, 'in');
+  return squeezed ? 'z' + b64.to(squeezed) : 'j' + b64.to(raw);
+}
+
+async function unpackSheet(text) {
+  const bytes = b64.from(text.slice(1));
+  const raw = text[0] === 'z' ? await squeeze(bytes, 'out') : bytes;
+  if (!raw) return null;
+  return JSON.parse(new TextDecoder().decode(raw));
+}
 
 function chordName(raw) {
   if (!raw || raw === 'N') return 'N.C.';
@@ -147,6 +212,8 @@ function render(data) {
   lastCopyText = collapsed
     .map((c) => clock(c.start) + '  ' + c.name)
     .join('\n');
+  lastSheet = { k: data.key || '', c: collapsed.map(
+    (c) => [c.name, Math.round(c.start * 10) / 10, Math.round(c.end * 10) / 10]) };
 
   show(working, false);
   show(problem, false);
@@ -265,3 +332,42 @@ againBtn.addEventListener('click', () => {
   show(problem, false);
   document.getElementById('tool').scrollIntoView({ behavior: 'smooth' });
 });
+
+shareBtn.addEventListener('click', async () => {
+  if (!lastSheet) return;
+  try {
+    const link = location.origin + location.pathname + '#s=' + await packSheet(lastSheet);
+    await navigator.clipboard.writeText(link);
+    history.replaceState(null, '', '#s=' + await packSheet(lastSheet));
+    shareBtn.textContent = 'Link copied';
+    setTimeout(() => { shareBtn.textContent = 'Copy a link to this'; }, 1800);
+  } catch (_) {
+    shareBtn.textContent = 'Could not copy the link';
+    setTimeout(() => { shareBtn.textContent = 'Copy a link to this'; }, 2200);
+  }
+});
+
+/* Somebody arriving on a shared link sees the chart, not the drop zone.
+   This is the whole point of the feature: the person who receives it did
+   not upload anything and should not be asked to. */
+(async function openShared() {
+  const match = location.hash.match(/^#s=(.+)$/);
+  if (!match) return;
+  try {
+    const sheet = await unpackSheet(decodeURIComponent(match[1]));
+    if (!sheet || !Array.isArray(sheet.c) || sheet.c.length === 0) return;
+    show(document.getElementById('tool'), false);
+    // Handed back as `chord`, the field `collapse` reads. `chordName` is
+    // idempotent on an already-formatted name — "Gm" has no colon, so it
+    // comes back out as "Gm" — which is what lets the chart be rebuilt
+    // through the same path that drew it in the first place rather than a
+    // second renderer that would drift from this one.
+    render({
+      key: sheet.k,
+      chords: sheet.c.map(([name, start, end]) => ({ chord: name, start, end })),
+    });
+  } catch (_) {
+    /* A truncated or edited link falls through to the normal tool, which
+       is a working page rather than an error. */
+  }
+})();
