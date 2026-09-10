@@ -26,6 +26,37 @@ const copyBtn = document.getElementById('copy');
 const shareBtn = document.getElementById('share');
 const againBtn = document.getElementById('again');
 const gate = document.getElementById('gate');
+
+/* ------------------------------------------------------------------
+   Where people stop.
+
+   The tool has been live for days and the database holds one requester
+   and three analyses, all of them ours on the day it shipped. So the
+   question this answers is not "which step loses people" yet — it is
+   the plainer one of whether anybody arrives at all, which right now
+   nothing on this site can answer.
+
+   Every step is recorded from here rather than some from the server,
+   because a funnel whose steps are measured by different mechanisms
+   cannot be compared across steps, and comparing across steps is the
+   entire purpose of a funnel.
+
+   `keepalive` matters on the ones that precede a navigation: without
+   it, following a link cancels the request that was recording that the
+   link was followed.
+   ------------------------------------------------------------------ */
+function note(step) {
+  try {
+    fetch(ENDPOINT + '/note', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ step }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch (_) {
+    /* Measurement never breaks the page it measures. */
+  }
+}
 const gateBack = document.getElementById('gate-back');
 
 /* Harte notation into what a musician writes.
@@ -162,6 +193,7 @@ function show(el, on) {
 }
 
 function fail(message) {
+  note('analyzed_fail');
   show(working, false);
   show(result, false);
   problem.textContent = message;
@@ -218,11 +250,13 @@ function render(data) {
   show(working, false);
   show(problem, false);
   show(result, true);
+  note('analyzed_ok');
   result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 async function send(file) {
   if (!file) return;
+  note('chose_file');
   if (file.size > 24 * 1024 * 1024) {
     fail('That file is over 24MB. A normal song is well under it.');
     return;
@@ -266,6 +300,7 @@ async function send(file) {
         show(result, false);
         show(problem, false);
         show(gate, true);
+        note('limit_reached');
         gate.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         return;
       }
@@ -312,6 +347,7 @@ drop.addEventListener('drop', (event) => {
 });
 
 copyBtn.addEventListener('click', async () => {
+  note('copied_text');
   try {
     await navigator.clipboard.writeText(lastCopyText);
     copyBtn.textContent = 'Copied';
@@ -335,6 +371,7 @@ againBtn.addEventListener('click', () => {
 
 shareBtn.addEventListener('click', async () => {
   if (!lastSheet) return;
+  note('shared_link');
   try {
     const link = location.origin + location.pathname + '#s=' + await packSheet(lastSheet);
     await navigator.clipboard.writeText(link);
@@ -358,6 +395,7 @@ shareBtn.addEventListener('click', async () => {
     if (!sheet || !Array.isArray(sheet.c) || sheet.c.length === 0) return;
     // The drop zone, not the whole section — `#result` lives inside `#tool`,
     // so hiding the section hides the chart it was meant to reveal.
+    note('opened_shared');
     show(drop, false);
     // Handed back as `chord`, the field `collapse` reads. `chordName` is
     // idempotent on an already-formatted name — "Gm" has no colon, so it
@@ -373,3 +411,16 @@ shareBtn.addEventListener('click', async () => {
        is a working page rather than an error. */
   }
 })();
+
+/* The page was opened, and the two ways somebody leaves it towards the
+   product. `clicked_app` and `clicked_onward` are separate because they
+   are different levels of interest: one is "show me more about this",
+   the other is "I want the thing". */
+note('opened');
+
+for (const link of document.querySelectorAll('.onward')) {
+  link.addEventListener('click', () => note('clicked_onward'));
+}
+for (const link of document.querySelectorAll('a[href*="app.colabroom.com"], a[href^="mailto:beta@"]')) {
+  link.addEventListener('click', () => note('clicked_app'));
+}
