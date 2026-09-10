@@ -356,7 +356,9 @@ shareBtn.addEventListener('click', async () => {
   try {
     const sheet = await unpackSheet(decodeURIComponent(match[1]));
     if (!sheet || !Array.isArray(sheet.c) || sheet.c.length === 0) return;
-    show(document.getElementById('tool'), false);
+    // The drop zone, not the whole section — `#result` lives inside `#tool`,
+    // so hiding the section hides the chart it was meant to reveal.
+    show(drop, false);
     // Handed back as `chord`, the field `collapse` reads. `chordName` is
     // idempotent on an already-formatted name — "Gm" has no colon, so it
     // comes back out as "Gm" — which is what lets the chart be rebuilt
