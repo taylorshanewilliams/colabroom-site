@@ -26,6 +26,11 @@ const copyBtn = document.getElementById('copy');
 const shareBtn = document.getElementById('share');
 const againBtn = document.getElementById('again');
 const gate = document.getElementById('gate');
+const sharedNote = document.getElementById('shared-note');
+
+/* Set when the page was opened on a link somebody sent, which changes what
+   almost every control on it should say. */
+let arrivedShared = false;
 
 /* ------------------------------------------------------------------
    Where people stop.
@@ -370,9 +375,23 @@ gateBack.addEventListener('click', () => {
 });
 
 againBtn.addEventListener('click', () => {
+  // `show(drop, true)` is not redundant. Arriving on a shared link hides the
+  // drop zone, so before this line the button emptied the page instead of
+  // resetting it — the one path through the tool that had never been walked
+  // from the start.
+  if (arrivedShared) {
+    note('made_own');
+    arrivedShared = false;
+    history.replaceState(null, '', location.pathname);
+    againBtn.textContent = 'Try another song';
+    againBtn.classList.add('quiet');
+    shareBtn.classList.remove('quiet');
+    show(sharedNote, false);
+  }
   fileInput.value = '';
   show(result, false);
   show(problem, false);
+  show(drop, true);
   document.getElementById('tool').scrollIntoView({ behavior: 'smooth' });
 });
 
@@ -403,7 +422,23 @@ shareBtn.addEventListener('click', async () => {
     // The drop zone, not the whole section — `#result` lives inside `#tool`,
     // so hiding the section hides the chart it was meant to reveal.
     note('opened_shared');
+    arrivedShared = true;
     show(drop, false);
+    show(sharedNote, true);
+
+    /* The page still greeted them with "Drop in a song. Get the chords back."
+       — an instruction for a job already done, addressed to somebody who did
+       not do it. Whoever opens one of these is the most interested visitor
+       this site gets: they were sent chords by a musician they know. Say what
+       they are looking at, then offer the only thing they could want next. */
+    const heading = document.querySelector('.hero h1');
+    const sub = document.querySelector('.hero p');
+    if (heading) heading.innerHTML = 'Somebody sent you<br>these chords.';
+    if (sub) sub.textContent = 'Free, from a recording, in about a minute.';
+
+    againBtn.textContent = 'Do this with your own song';
+    againBtn.classList.remove('quiet');
+    shareBtn.classList.add('quiet');
     // Handed back as `chord`, the field `collapse` reads. `chordName` is
     // idempotent on an already-formatted name — "Gm" has no colon, so it
     // comes back out as "Gm" — which is what lets the chart be rebuilt
