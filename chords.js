@@ -59,9 +59,30 @@ let arrivedShared = false;
    the one shape that is harmless against both the old deployment and
    the new one. Correctness under a version skew beats REST here.
    ------------------------------------------------------------------ */
+/* Where this visitor came from.
+
+   A flier on a board, a card on a merch table, a link under a video:
+   each carries ?c=<code>. The page keeps the code for the visit and
+   for next time, every step below carries it, and the link onward to
+   the app carries it as ?from=, so an account made there can say which
+   board it came from. The code names a place, never a person. */
+const CODE = (() => {
+  try {
+    const raw = new URL(location.href).searchParams.get('c');
+    if (raw && /^[a-z0-9-]{1,32}$/i.test(raw)) {
+      localStorage.setItem('colabroom_code', raw.toLowerCase());
+      return raw.toLowerCase();
+    }
+    return localStorage.getItem('colabroom_code') || '';
+  } catch (_) {
+    return '';
+  }
+})();
+
 function note(step) {
   try {
-    fetch(ENDPOINT + '/note?step=' + encodeURIComponent(step), {
+    fetch(ENDPOINT + '/note?step=' + encodeURIComponent(step)
+        + (CODE ? '&c=' + encodeURIComponent(CODE) : ''), {
       cache: 'no-store',
       keepalive: true,
     }).catch(() => {});
@@ -465,4 +486,14 @@ for (const link of document.querySelectorAll('.onward')) {
 }
 for (const link of document.querySelectorAll('a[href*="app.colabroom.com"], a[href^="mailto:beta@"]')) {
   link.addEventListener('click', () => note('clicked_app'));
+  // The code rides on to the app, where an account claims it.
+  if (CODE && link.href.includes('app.colabroom.com')) {
+    try {
+      const onward = new URL(link.href);
+      onward.searchParams.set('from', CODE);
+      link.href = onward.toString();
+    } catch (_) {
+      /* A link that cannot be rewritten still works as it was. */
+    }
+  }
 }
