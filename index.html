@@ -61,6 +61,31 @@
     <div class="meta">Free during the beta · iPhone, Android and your browser</div>
   </div>
 
+  <!-- Tonight: the same prompt the app hands out today, so the front door
+       is alive from the same rows. Fetched from the public tool's function;
+       the page ships no credentials. Hidden until it arrives. -->
+  <section class="moment reveal" id="tonight" hidden>
+    <div class="eyebrow">Tonight</div>
+    <h2 id="tonight-title">Write the first line</h2>
+    <p class="lede" id="tonight-body"></p>
+    <a class="more" href="https://app.colabroom.com/">Record it in the app →</a>
+  </section>
+  <script>
+    (function () {
+      try {
+        fetch('https://gzcoclsfvazfhcheefhz.supabase.co/functions/v1/analyze-public/tonight', { cache: 'default' })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (row) {
+            if (!row || !row.body) return;
+            document.getElementById('tonight-title').textContent = row.title || 'Tonight';
+            document.getElementById('tonight-body').textContent = row.body;
+            document.getElementById('tonight').hidden = false;
+          })
+          .catch(function () { /* A quiet night is fine. */ });
+      } catch (_) { /* Same. */ }
+    })();
+  </script>
+
   <section class="moment reveal">
     <div class="eyebrow">Takes</div>
     <h2>Everybody plays on it.</h2>
