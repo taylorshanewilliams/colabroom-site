@@ -184,7 +184,7 @@
   <a class="back" href="/">← CoLabRoom</a>
 
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated September 8, 2026</p>
+  <p class="updated">Last updated September 15, 2026</p>
 
   <p class="notice">
     CoLabRoom is published by <strong style="color: var(--text)">Decibel Zero LLC</strong>
@@ -236,6 +236,31 @@
     your account.
   </p>
 
+  <h3>What you say to people</h3>
+  <p>
+    Messages you send to one person, lines you write in a room's thread,
+    replies on an ask, the note you can leave with “heard it”, and the
+    questions you ask the app about a song are all stored, so the people
+    they are for can read them. Each is yours to take back from inside the
+    app. Who can see each one is under “Who can see what” below.
+  </p>
+
+  <h3>Looking for people</h3>
+  <p>
+    A note that you would like to meet somebody who plays a particular part
+    is stored for a month and shown to musicians who play it. Sending or
+    answering a connection request is stored so the app knows who your
+    people are.
+  </p>
+
+  <h3>Whether you are here right now</h3>
+  <p>
+    While the app is open it tells our realtime service that you are, so
+    your people — connections, and everybody you share a room with — can
+    see a mark beside your name. It is not written down: closing the app
+    ends it, and there is no record of when you were here.
+  </p>
+
   <h3>Notifications on your phone</h3>
   <p>
     If you turn notifications on, your phone hands us a delivery token. We
@@ -245,6 +270,12 @@
     account on the same phone moves it, uninstalling makes it stop working
     and we drop it the next time we try, and deleting your account deletes
     it. The notification itself carries only what you would see in the app.
+  </p>
+  <p>
+    The app also tells us when a notification reached your phone — with the
+    app open, with it closed, or because you tapped it — so we can see for
+    ourselves that delivery works rather than guess. That is stored on the
+    notification itself and goes when it goes.
   </p>
 
   <h3>Reports and blocks</h3>
@@ -261,7 +292,9 @@
     were on, and your app version and platform. If the app crashes or hits an
     unexpected error, the same version/platform information and an error
     message are recorded automatically so we can find and fix it — this
-    doesn't include your song content.
+    doesn't include your song content. Each time the app is opened it
+    records that a session started, with the version and platform, so an
+    error count has something to be divided by.
   </p>
 
   <h2>Analysis: where a recording actually goes</h2>
@@ -275,6 +308,8 @@
     <div class="row"><span class="who">Google Cloud Run</span><span>Runs our own chord-detection code, to work out what's being played.</span></div>
     <div class="row"><span class="who">RunPod</span><span>Also transcribes the words for a song sheet. That runs on the same worker as the separation, on our own code — the vocal does not leave that machine.</span></div>
     <div class="row"><span class="who">OpenAI</span><span>Used for the shorter path only: voice notes, and recordings you transcribe from Takes. The isolated vocal — not the full mix — goes to OpenAI's transcription API. Governed by <a href="https://openai.com/policies/api-data-usage-policies" target="_blank" rel="noopener">OpenAI's own API data terms</a>.</span></div>
+    <div class="row"><span class="who">RunPod</span><span>Also works out the tune of the isolated vocal. That is where the sung range shown on a song sheet — and on your Open Mic profile, if you have listed yourself — comes from. Same worker, our own code.</span></div>
+    <div class="row"><span class="who">Anthropic or OpenAI</span><span>Only when you ask the app a question about a song. Your question and what the app has already worked out — the title, key, chords, sections, up to sixty lines of the words, and which parts people have played on it — go to a language model that writes the answer. The recording never does. Which model depends on how we have configured it: Anthropic's API when a key for it is set, otherwise OpenAI's. Both publish API terms under which what is sent is not used to train their models. We keep your question and the answer too.</span></div>
     <div class="row"><span class="who">Apple or Google</span><span>If you dictate lyrics rather than type them, the phone's own speech recogniser is used, and on iOS that may send what you say to Apple. It's the system feature, not ours, and it only runs while you're dictating.</span></div>
   </div>
   <p>
@@ -328,6 +363,43 @@
     it.
   </p>
 
+  <h3>Talking</h3>
+  <ul>
+    <li>
+      <strong>A message to one person</strong> is seen by the two of you.
+      Either of you can take back your own lines. Blocking closes the thread
+      in both directions at once.
+    </li>
+    <li>
+      <strong>A room's thread</strong> is seen by everybody in the room —
+      including people who join later, who can read what was said before
+      they arrived. Leaving the room ends your access to it; deleting the
+      room deletes it.
+    </li>
+    <li>
+      <strong>A reply on an ask</strong> is seen by the people who can see
+      the ask: whoever asked, whoever was asked, and the room the song lives
+      in.
+    </li>
+    <li>
+      <strong>A note left with “heard it”</strong> reaches the person who
+      put the song up, as a notification.
+    </li>
+    <li>
+      <strong>A note that you would like to meet somebody</strong> is shown,
+      for a month, to musicians who play that part and have chosen to be
+      findable.
+    </li>
+    <li>
+      <strong>Whether you are here right now</strong> is visible to your
+      people while the app is open, and to nobody else.
+    </li>
+  </ul>
+  <p>
+    A notification about any of these carries the sender's name and the first
+    part of what they said, and nothing more.
+  </p>
+
   <h2>The chord tool on this website</h2>
   <p>
     The <a href="chords.html">chord tool</a> takes an audio file, works out the
@@ -357,16 +429,27 @@
     that plainly rather than implying a cleanup schedule that doesn't exist
     yet.
   </p>
+  <p>
+    Messages and threads stay until whoever wrote a line takes it back, the
+    room is deleted, or the account is. A note looking for somebody expires
+    after a month. Questions you asked the app, and its answers, stay with
+    your account. A delivery receipt lives and dies with the notification
+    it belongs to.
+  </p>
 
   <h2>Your controls</h2>
   <ul>
     <li>Delete a voice note, a recording, or a song at any time from inside the app.</li>
     <li>Export a song or setlist as text or a printable PDF.</li>
+    <li>Take back any message, reply or note you wrote, from the line itself.</li>
+    <li>Leave a room you no longer want to be in — its songs and its thread go with it.</li>
     <li>
       Delete your account from <strong style="color: var(--text)">Account → Delete account</strong>.
       This is immediate, permanent, and has no recovery window — see the
       account-deletion details on the <a href="/#beta">CoLabRoom home page</a>
       for exactly what it removes, including what happens to rooms you own.
+      It also deletes every message you sent, in rooms and to people, your
+      questions to the app, your notes and your connection requests.
     </li>
     <li>Can't sign in? Email <a href="mailto:support@colabroom.com">support@colabroom.com</a> from the address you signed up with.</li>
   </ul>
