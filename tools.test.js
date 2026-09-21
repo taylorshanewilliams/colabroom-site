@@ -807,6 +807,75 @@ Deno.test('numbers can be read off a chart as well as written onto one', () => {
   eq(lyric.chords, []);
 });
 
+/* ==================================================================
+   The examples the pages ship with
+
+   Each page has a song already in the box, because a tool that opens empty
+   asks the visitor to do the work before it has shown them anything. These
+   read the real pages, so an example somebody edits by hand cannot quietly
+   stop being the thing the page promises.
+   ================================================================== */
+
+function exampleIn(page, attribute) {
+  const html = Deno.readTextFileSync(new URL(page, import.meta.url)).replace(/\r\n/g, '\n');
+  if (attribute !== undefined) {
+    const match = new RegExp('data-' + attribute + '="([^"]*)"').exec(html);
+    if (match === null) throw new Error(page + ' has no data-' + attribute);
+    return match[1];
+  }
+  const match = /<textarea[^>]*>\n?([\s\S]*?)<\/textarea>/.exec(html);
+  if (match === null) throw new Error(page + ' has no chart box');
+  return match[1];
+}
+
+Deno.test("the transpose page's example goes to A the way the page says", () => {
+  const chart = exampleIn('transpose.html');
+  eq(chartKey(readChart(chart)), 'G');
+  eq(round(chart, 2, 'G', { key: 'A', capo: 0 }), [
+    'Key: A',
+    '',
+    '[Verse]',
+    '       A         E',
+    'I left the porch light on',
+    '    F#m      D',
+    'The long way round again',
+    '',
+    'Chorus:  D  A  E  F#m',
+  ].join('\n'));
+  // And the headline over it, which is the app's own sentence.
+  eq(capoLine('G', 0, 2), 'A');
+  eq(capoLine('G', 4, 2), 'Capo 4 · F shapes · sounds in A');
+});
+
+Deno.test("the capo page's example is the capo 3 in the headline", () => {
+  const chart = readChart(exampleIn('capo.html'));
+  // Once each, in the order the song reaches for them.
+  eq(chart.chords, ['Bb', 'Eb', 'F', 'Gm']);
+  const found = capoThatHelps(chart.chords, GUITAR);
+  eq(found.fret, 3, 'the H1 on that page says Capo 3');
+  eq(found.shapes, ['G', 'C', 'D', 'Em']);
+  // On a ukulele the same song is a different answer, which is the point of
+  // the toggle beside it.
+  const uke = capoThatHelps(chart.chords, UKULELE);
+  eq(uke.fret, 1);
+  eq(uke.shapes, ['A', 'D', 'E', 'F#m']);
+});
+
+Deno.test("the numbers page's two examples are the same song", () => {
+  const letters = exampleIn('nashville-numbers.html', 'letters');
+  const numbers = exampleIn('nashville-numbers.html', 'numbers');
+  // The box holds the letters one; the other is swapped in when somebody
+  // turns the tool round. They have to be the same chart or the page lies.
+  eq(exampleIn('nashville-numbers.html').trim(), letters.trim());
+  eq(rowsAsText(layoutChart(readChart(letters),
+    (chord) => chordAsDegree(chord, 'G major') ?? chord)), numbers);
+  eq(rowsAsText(layoutChart(readChart(numbers, { degrees: true }),
+    (token) => degreeAsChord(token, 'G major') ?? token)), letters);
+  // And the H1 on that page.
+  eq(chordAsDegree('G', 'G major') + ' ' + chordAsDegree('C', 'G major') + ' ' +
+    chordAsDegree('D', 'G major'), '1 4 5');
+});
+
 Deno.test('a whole chart goes to numbers and back', () => {
   const chart = [
     'Key: G',

@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nashville number system — letters to 1 4 5 — CoLabRoom</title>
+<meta name="description" content="Turn a chord chart into Nashville numbers or Roman numerals, and back again. Both ways of counting a minor song. Free, no account, and the chart never leaves your browser.">
+<meta property="og:title" content="G C D is 1 4 5.">
+<meta property="og:description" content="Turn a chord chart into Nashville numbers or Roman numerals, and back again. No account. Nothing leaves the page.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="site.css">
+  <link rel="canonical" href="https://colabroom.com/nashville-numbers.html">
+  <meta property="og:url" content="https://colabroom.com/nashville-numbers.html">
+  <meta property="og:site_name" content="CoLabRoom">
+  <meta property="og:image" content="https://colabroom.com/share.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="CoLabRoom — songwriting for musicians who aren't in the same room.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Nashville number system — letters to 1 4 5 — CoLabRoom">
+  <meta name="twitter:description" content="Turn a chord chart into Nashville numbers or Roman numerals, and back again. No account. Nothing leaves the page.">
+  <meta name="twitter:image" content="https://colabroom.com/share.png">
+  <meta name="theme-color" content="#06101F">
+
+<!-- The free tools share a block of styles. It lives in each page rather than
+     in site.css so this change touches no file anything else is editing; it
+     folds into site.css the first time all three are in the navigation. -->
+<style>
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: .85rem 1.25rem;
+  align-items: flex-end; margin: 1.25rem 0;
+}
+.field { display: flex; flex-direction: column; gap: .35rem; }
+.field span, .seg legend {
+  font-family: var(--mono); font-size: .625rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--muted); padding: 0;
+}
+.field select, .chartbox, .step button, .seg span {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: .6rem; color: var(--text);
+}
+.field select {
+  font-family: var(--display); font-size: 1rem; font-weight: 700;
+  padding: .55rem .7rem; min-height: 2.9rem; min-width: 8.5rem;
+}
+.step { display: flex; gap: .4rem; }
+.step button {
+  font-family: var(--display); font-weight: 800; font-size: 1.15rem;
+  min-width: 2.9rem; min-height: 2.9rem; cursor: pointer;
+}
+.step button:hover { border-color: var(--cyan); }
+select:focus-visible, button:focus-visible, textarea:focus-visible,
+.seg input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* Radios underneath, so a keyboard gets a radio group and a screen reader
+   gets a named set rather than a row of buttons that say nothing. */
+.seg { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35rem; }
+.seg .choices { display: flex; flex-wrap: wrap; gap: .4rem; }
+.seg label { display: inline-flex; }
+.seg input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.seg span {
+  font-family: var(--display); font-weight: 700; font-size: .9rem;
+  padding: .6rem 1rem; min-height: 2.9rem; display: inline-flex; align-items: center;
+  border-radius: 100px; color: var(--muted); cursor: pointer;
+}
+.seg input:checked + span { color: var(--text); border-color: var(--cyan); background: #0C1D33; }
+.tool .seg { margin-bottom: 1rem; }
+
+.chartbox {
+  width: 100%; min-height: 10rem; resize: vertical; display: block;
+  font-family: var(--mono); font-size: .8125rem; line-height: 1.75;
+  padding: 1rem; white-space: pre; overflow-x: auto; tab-size: 8;
+}
+.answer {
+  font-family: var(--display); font-size: clamp(1.25rem, 4.5vw, 1.7rem);
+  font-weight: 800; color: var(--text); margin: 0;
+}
+.answer-detail {
+  font-family: var(--display); font-size: clamp(1.1rem, 4vw, 1.4rem);
+  font-weight: 700; color: var(--gold); letter-spacing: .05em; margin: .4rem 0 0;
+}
+.quiet-line { color: var(--muted); font-size: .9rem; margin: .5rem 0 0; }
+
+.sheet {
+  font-family: var(--mono); font-size: .8125rem; line-height: 1.75;
+  color: var(--body); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 1rem; margin: 1.1rem 0; overflow-x: auto;
+  white-space: pre; tab-size: 8;
+}
+/* Gold rather than bold: the mono face is loaded at one weight, and a
+   synthesised bold could move a column by a hair — which on a page whose
+   whole job is columns would be the one visible bug. */
+.sheet .ch { color: var(--gold); display: inline-block; transform-origin: 50% 90%; }
+@media (prefers-reduced-motion: no-preference) {
+  .sheet.flip .ch { animation: chord-flip .3s ease both; }
+}
+@keyframes chord-flip {
+  from { transform: rotateX(80deg); opacity: .25; }
+  to { transform: none; opacity: 1; }
+}
+
+.cheat { margin-top: 1.25rem; }
+.cheat-line {
+  display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; align-items: baseline;
+  padding: .55rem 0; border-bottom: 1px solid rgba(22, 48, 79, .55);
+}
+.cheat-line b {
+  font-family: var(--display); font-weight: 800; color: var(--text);
+  flex: 0 0 5rem; font-size: .95rem;
+}
+.cheat-line span { font-family: var(--mono); font-size: .78rem; color: var(--body); }
+
+@media (max-width: 40rem) {
+  .toolbar { gap: .75rem 1rem; }
+  .field select { min-width: 7.5rem; }
+  .cheat-line b { flex-basis: 100%; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  body { background: #fff; color: #000; }
+  .wrap { max-width: none; padding: 0; }
+  .hero { padding: 0 0 1rem; }
+  .hero h1 { color: #000; font-size: 1.6rem; }
+  .answer, .answer-detail, .cheat-line b { color: #000; }
+  .sheet { background: none; border: 0; padding: 0; color: #000; font-size: 10pt; }
+  .sheet .ch { color: #000; font-weight: 700; }
+  .cheat-line { border-bottom: 1px solid #ccc; }
+  .cheat-line span { color: #333; }
+  section.moment { padding: 1rem 0; border: 0; }
+}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Nashville number system converter",
+  "url": "https://colabroom.com/nashville-numbers.html",
+  "applicationCategory": "MusicApplication",
+  "operatingSystem": "Web",
+  "browserRequirements": "Requires JavaScript for the chart box. The cheat sheet works without it.",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@type": "Organization", "name": "CoLabRoom", "url": "https://colabroom.com/" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to write a chord chart in Nashville numbers",
+  "totalTime": "PT1M",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "Choose which way you are going",
+      "text": "Letters to numbers if you have a chart, numbers to letters if somebody handed you one in numbers."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Say what key the song is in",
+      "text": "Everything is counted from there. Nothing is guessed from the chords, because a guessed key would silently renumber the whole page."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Pick numbers or Roman numerals",
+      "text": "Nashville writes minor as a dash, so A minor in G is 2 dash. Roman numerals say it in the case instead: ii."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "For a minor song, say which note it counts from",
+      "text": "The relative major by default, where A minor reads 6 dash, or the minor tonic, where the same song reads 1 dash. Both are in daily use."
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does 1 4 5 mean?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The first, fourth and fifth chords of whatever key the song is in. In G that is G, C and D. In E it is E, A and B. Same numbers, different letters, which is why a band leader asks for them."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why do bands use numbers instead of chord names?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Because the chart survives a change of key. Drop the song a tone for the singer and every letter on a normal chart is wrong, while a chart in numbers does not change a mark."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you number a song in a minor key?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Two ways, and both are in daily use. Chas Williams' book, where the system is written down, builds every chart on the major scale, so A minor is counted against C and its home chord is 6 dash. Plenty of players count from the minor tonic instead and read the same song as 1 dash, flat 7, flat 6, flat 3."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between Nashville numbers and Roman numerals?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The same idea in two languages. Nashville uses digits and writes minor as a dash; Roman numerals put the quality in the case, so a minor two is ii. Roman numerals always count a minor key from its own tonic, which is why the minor question above only appears for numbers."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top no-print">
+    <a class="brand" href="index.html">CoLabRoom</a>
+    <nav class="pages">
+      <a href="chords.html">Chords</a>
+      <a href="takes.html">Takes</a>
+      <a href="analysis.html">What it heard</a>
+      <a href="songbook.html">Song sheet</a>
+      <a href="help.html">Stuck?</a>
+      <a href="bands.html">Your room</a>
+      <a href="openmic.html">Open Mic</a>
+    </nav>
+    <span class="sp"></span>
+    <a class="cta quiet" href="https://app.colabroom.com/">Sign in</a>
+    <a class="cta" href="https://app.colabroom.com/">Open the app</a>
+  </header>
+
+  <div class="hero inner">
+    <h1>G C D is 1 4 5.</h1>
+    <p>Paste a chart, say the key, and read it in numbers. Or the other way round.</p>
+    <div class="meta no-print">Free · No account · The chart never leaves this page</div>
+  </div>
+
+  <section class="tool" id="tool" data-tool="numbers">
+
+    <noscript>
+      <p class="problem">This one needs JavaScript switched on — the arithmetic
+      happens here in the page. Either way nothing is sent anywhere.</p>
+    </noscript>
+
+    <fieldset class="seg no-print">
+      <legend>Which way</legend>
+      <div class="choices">
+        <label><input type="radio" name="way" value="to-numbers" checked><span>Letters → numbers</span></label>
+        <label><input type="radio" name="way" value="to-letters"><span>Numbers → letters</span></label>
+      </div>
+    </fieldset>
+
+    <div class="field no-print">
+      <label for="chart-in"><span>Your chart</span></label>
+      <textarea id="chart-in" class="chartbox" spellcheck="false" wrap="off"
+        aria-describedby="chart-note"
+        data-letters="Key: G
+
+[Verse]
+       G         D
+I left the porch light on
+    Em       C
+The long way round again
+
+Chorus:  C  G  D  Em"
+        data-numbers="Key: G
+
+[Verse]
+       1         5
+I left the porch light on
+    6-       4
+The long way round again
+
+Chorus:  4  1  5  6-">
+Key: G
+
+[Verse]
+       G         D
+I left the porch light on
+    Em       C
+The long way round again
+
+Chorus:  C  G  D  Em</textarea>
+    </div>
+    <p class="quiet-line no-print" id="chart-note"></p>
+
+    <div class="toolbar no-print">
+      <label class="field">
+        <span>The key it's in</span>
+        <select id="chart-key"></select>
+      </label>
+      <fieldset class="seg">
+        <legend>Written as</legend>
+        <div class="choices">
+          <label><input type="radio" name="style" value="numbers" checked><span>Numbers</span></label>
+          <label><input type="radio" name="style" value="roman"><span>Roman</span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- Only a minor song in Nashville numbers has this question, and both
+         answers are in daily use. Neither is the advanced one. -->
+    <fieldset class="seg no-print" id="minor-row" hidden>
+      <legend>A minor song counts from</legend>
+      <div class="choices">
+        <label><input type="radio" name="minor" value="relative" checked><span>6- (the relative major)</span></label>
+        <label><input type="radio" name="minor" value="tonic"><span>1- (the minor tonic)</span></label>
+      </div>
+    </fieldset>
+
+    <p class="answer" id="answer" role="status">—</p>
+    <pre class="sheet" id="sheet" tabindex="0" aria-label="Your chart, in numbers"></pre>
+
+    <div class="result-foot no-print">
+      <button type="button" class="cta" id="copy">Copy the chart</button>
+      <button type="button" class="cta quiet" id="print">Print it</button>
+    </div>
+  </section>
+
+  <section class="moment reveal no-print">
+    <div class="eyebrow">Why anybody bothers</div>
+    <h2>The singer drops it a tone and the chart doesn't change.</h2>
+    <p class="lede">
+      That is the whole thing. On a normal chart, moving a song for somebody's
+      voice makes every letter on the page wrong. On a number chart, 1 4 5 is
+      still 1 4 5 — the band works out the letters on the way to the microphone.
+      It is why a session player would rather be handed numbers.
+    </p>
+  </section>
+
+  <section class="moment reveal no-print">
+    <div class="eyebrow">How to read one</div>
+    <h2>Count the chords of the key, one to seven.</h2>
+    <p class="lede">
+      In G, that is G A B C D E F♯ — so G is 1, C is 4 and D is 5. A minor chord
+      gets a dash after the number, which is why Am in G is 2-. Anything from
+      outside the key carries a flat or a sharp in front: the F in a G song is
+      ♭7. Roman numerals say the same thing with the quality in the case.
+    </p>
+  </section>
+
+  <section class="moment reveal">
+    <div class="eyebrow">Minor songs</div>
+    <h2>There are two right answers.</h2>
+    <p class="lede">
+      Chas Williams' <em>The Nashville Number System</em> — the book the whole
+      thing is written down in — builds every chart on the major scale, so a
+      song in A minor is counted against C and its home chord is 6-. Plenty of
+      players who mostly read minor material count from the minor tonic instead
+      and read the same song as 1- ♭7 ♭6 ♭3. Both are on this page and neither
+      is the advanced one. Roman numerals don't have the argument: they always
+      count a minor key from its own tonic.
+    </p>
+  </section>
+
+  <section class="moment reveal">
+    <div class="eyebrow">Stick it on the wall</div>
+    <h2>The cheat sheet.</h2>
+    <div class="cheat">
+      <div class="cheat-line"><b>C</b><span>1 C</span><span>2- Dm</span><span>3- Em</span><span>4 F</span><span>5 G</span><span>6- Am</span><span>7° B°</span></div>
+      <div class="cheat-line"><b>D</b><span>1 D</span><span>2- Em</span><span>3- F#m</span><span>4 G</span><span>5 A</span><span>6- Bm</span><span>7° C#°</span></div>
+      <div class="cheat-line"><b>E</b><span>1 E</span><span>2- F#m</span><span>3- G#m</span><span>4 A</span><span>5 B</span><span>6- C#m</span><span>7° D#°</span></div>
+      <div class="cheat-line"><b>F</b><span>1 F</span><span>2- Gm</span><span>3- Am</span><span>4 Bb</span><span>5 C</span><span>6- Dm</span><span>7° E°</span></div>
+      <div class="cheat-line"><b>G</b><span>1 G</span><span>2- Am</span><span>3- Bm</span><span>4 C</span><span>5 D</span><span>6- Em</span><span>7° F#°</span></div>
+      <div class="cheat-line"><b>A</b><span>1 A</span><span>2- Bm</span><span>3- C#m</span><span>4 D</span><span>5 E</span><span>6- F#m</span><span>7° G#°</span></div>
+      <div class="cheat-line"><b>Bb</b><span>1 Bb</span><span>2- Cm</span><span>3- Dm</span><span>4 Eb</span><span>5 F</span><span>6- Gm</span><span>7° A°</span></div>
+      <div class="cheat-line"><b>Eb</b><span>1 Eb</span><span>2- Fm</span><span>3- Gm</span><span>4 Ab</span><span>5 Bb</span><span>6- Cm</span><span>7° D°</span></div>
+    </div>
+    <p class="quiet-line">
+      Eight keys, the ones bands actually call. Any other key is in the box
+      above.
+    </p>
+  </section>
+
+  <nav class="keep-reading no-print" aria-label="The other free tools">
+    <p class="eyebrow">While you're here</p>
+    <div class="onward-row">
+      <a class="onward" href="transpose.html">
+        <span class="where">Transpose</span>
+        <span class="what">Move the whole chart to where you sing.</span>
+      </a>
+      <a class="onward" href="capo.html">
+        <span class="where">Capo chart</span>
+        <span class="what">Which fret puts it on open shapes.</span>
+      </a>
+      <a class="onward" href="chords.html" data-carry-code>
+        <span class="where">Got a recording and no chart?</span>
+        <span class="what">It will write the chords down.</span>
+      </a>
+      <a class="onward" href="https://app.colabroom.com/">
+        <span class="where">Keep it with the song</span>
+        <span class="what">Numbers, letters or Roman — one song, read your way.</span>
+      </a>
+    </div>
+  </nav>
+
+  <footer class="no-print">
+    <span>CoLabRoom — songwriting for musicians</span>
+    <span class="sp"></span>
+    <a href="index.html#beta">Account deletion</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <a href="copyright.html">Copyright</a>
+  </footer>
+
+</div>
+
+<script type="module" src="tools.js"></script>
+<script src="reveal.js"></script>
+</body>
+</html>

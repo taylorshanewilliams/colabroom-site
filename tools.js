@@ -1627,14 +1627,14 @@ function noteUsed() {
    Transpose
    ------------------------------------------------------------------ */
 
-function wireTranspose(page) {
-  const chartBox = page.querySelector('#chart-in');
-  const fromKey = page.querySelector('#from-key');
-  const toKey = page.querySelector('#to-key');
-  const capo = page.querySelector('#capo');
-  const answer = page.querySelector('#answer');
-  const sheet = page.querySelector('#sheet');
-  const note1 = page.querySelector('#chart-note');
+function wireTranspose() {
+  const chartBox = document.querySelector('#chart-in');
+  const fromKey = document.querySelector('#from-key');
+  const toKey = document.querySelector('#to-key');
+  const capo = document.querySelector('#capo');
+  const answer = document.querySelector('#answer');
+  const sheet = document.querySelector('#sheet');
+  const note1 = document.querySelector('#chart-note');
 
   fillKeys(fromKey, true);
   fillKeys(toKey, false);
@@ -1682,9 +1682,14 @@ function wireTranspose(page) {
     const rows = layoutChart(chart, (chord) => chordAsPlayed(chord, delta, writtenFrom), facts);
     draw(sheet, rows);
     sheet.dataset.text = rowsAsText(rows);
+    // "G major shapes · sounds in A major" is the same sentence twice over,
+    // so the word major comes off before the line is built.
+    const named = sounding.replace(/ major$/, '');
     answer.textContent = sounding === ''
       ? (fret > 0 ? 'Capo ' + fret : 'Moved by ' + delta + ' semitones')
-      : capoLine(sounding, fret, move);
+      : fret > 0
+        ? capoLine(named, fret, move)
+        : 'Now in ' + capoLine(named, 0, move) + '.';
   }
 
   for (const control of [fromKey, toKey, capo]) {
@@ -1695,12 +1700,12 @@ function wireTranspose(page) {
     });
   }
   chartBox.addEventListener('input', () => { noteUsed(); reread(); });
-  page.querySelector('#up').addEventListener('click', () => {
+  document.querySelector('#up').addEventListener('click', () => {
     noteUsed();
     toKey.value = matchKey(keyAsPlayed(toKey.value, 1));
     render();
   });
-  page.querySelector('#down').addEventListener('click', () => {
+  document.querySelector('#down').addEventListener('click', () => {
     noteUsed();
     toKey.value = matchKey(keyAsPlayed(toKey.value, -1));
     render();
@@ -1723,15 +1728,15 @@ function matchKey(key) {
    Capo
    ------------------------------------------------------------------ */
 
-function wireCapo(page) {
-  const chartBox = page.querySelector('#chart-in');
-  const answer = page.querySelector('#answer');
-  const detail = page.querySelector('#answer-detail');
-  const sheet = page.querySelector('#sheet');
-  const keyPick = page.querySelector('#chart-key');
-  const chartRows = page.querySelector('#capo-rows');
-  const chartFor = page.querySelector('#chart-for');
-  const chartNote = page.querySelector('#chart-note');
+function wireCapo() {
+  const chartBox = document.querySelector('#chart-in');
+  const answer = document.querySelector('#answer');
+  const detail = document.querySelector('#answer-detail');
+  const sheet = document.querySelector('#sheet');
+  const keyPick = document.querySelector('#chart-key');
+  const chartRows = document.querySelector('#capo-rows');
+  const chartFor = document.querySelector('#chart-for');
+  const chartNote = document.querySelector('#chart-note');
 
   fillKeys(keyPick, false);
   keyPick.value = 'Bb major';
@@ -1739,7 +1744,7 @@ function wireCapo(page) {
   let reading = GUITAR;
 
   function instrument() {
-    const chosen = page.querySelector('input[name="instrument"]:checked');
+    const chosen = document.querySelector('input[name="instrument"]:checked');
     return chosen !== null && chosen.value === 'ukulele' ? UKULELE : GUITAR;
   }
 
@@ -1808,12 +1813,25 @@ function wireCapo(page) {
     }
   }
 
-  for (const radio of page.querySelectorAll('input[name="instrument"]')) {
+  /* The printable chart for every key is in the page as plain HTML, both
+     instruments' worth, so it prints and reads with no JavaScript at all —
+     which is the half of this page a teacher would link to. All this does is
+     show the one that matches the radio. */
+  function showFullChart() {
+    const guitar = document.getElementById('full-guitar');
+    const ukulele = document.getElementById('full-ukulele');
+    if (guitar === null || ukulele === null) return;
+    guitar.hidden = reading !== GUITAR;
+    ukulele.hidden = reading !== UKULELE;
+  }
+
+  for (const radio of document.querySelectorAll('input[name="instrument"]')) {
     radio.addEventListener('change', () => {
       reading = instrument();
       noteUsed();
       render();
       drawChart();
+      showFullChart();
     });
   }
   chartBox.addEventListener('input', () => { noteUsed(); render(); });
@@ -1826,57 +1844,69 @@ function wireCapo(page) {
    Nashville numbers
    ------------------------------------------------------------------ */
 
-function wireNumbers(page) {
-  const chartBox = page.querySelector('#chart-in');
-  const keyPick = page.querySelector('#chart-key');
-  const sheet = page.querySelector('#sheet');
-  const answer = page.querySelector('#answer');
-  const minorRow = page.querySelector('#minor-row');
+function wireNumbers() {
+  const chartBox = document.querySelector('#chart-in');
+  const keyPick = document.querySelector('#chart-key');
+  const sheet = document.querySelector('#sheet');
+  const answer = document.querySelector('#answer');
+  const minorRow = document.querySelector('#minor-row');
+  const chartNote = document.querySelector('#chart-note');
 
   fillKeys(keyPick, false);
   keyPick.value = 'G major';
+  let touchedKey = false;
 
   function way() {
-    const chosen = page.querySelector('input[name="way"]:checked');
+    const chosen = document.querySelector('input[name="way"]:checked');
     return chosen === null ? 'to-numbers' : chosen.value;
   }
 
   function style() {
-    const chosen = page.querySelector('input[name="style"]:checked');
+    const chosen = document.querySelector('input[name="style"]:checked');
     return chosen === null ? 'numbers' : chosen.value;
   }
 
   function fromMinorTonic() {
-    const chosen = page.querySelector('input[name="minor"]:checked');
+    const chosen = document.querySelector('input[name="minor"]:checked');
     return chosen !== null && chosen.value === 'tonic';
   }
 
   function render() {
+    const toNumbers = way() === 'to-numbers';
+    const chart = readChart(chartBox.value.slice(0, CHART_LIMIT), { degrees: !toNumbers });
+
+    // The chart's own key line is the one to count from. Everything here is
+    // counted from a key and nothing is guessed from the chords, because a
+    // guessed key would silently renumber somebody's whole page.
+    const said = chartKey(chart);
+    if (said !== null && !touchedKey) keyPick.value = matchKey(said);
+    chartNote.textContent = said === null
+      ? 'Your chart does not say what key it is in, so pick it above.'
+      : 'Your chart says it is in ' + said + '.';
+
     const key = keyPick.value;
     const roman = style() === 'roman';
     const tonic = fromMinorTonic();
-    const toNumbers = way() === 'to-numbers';
 
     // Roman numerals count a minor key from its own tonic in every theory
     // class, so there is nothing to ask — and the chips are spelled in
     // Nashville's words, which would mean nothing there.
     minorRow.hidden = !(keyIsMinor(key) && !roman);
 
-    const chart = readChart(chartBox.value.slice(0, CHART_LIMIT), { degrees: !toNumbers });
     const rows = layoutChart(chart, (chord) => toNumbers
       ? chordAsDegree(chord, key, { roman, fromMinorTonic: tonic }) ?? chord
       : degreeAsChord(chord, key, { fromMinorTonic: tonic }) ?? chord);
     draw(sheet, rows);
     sheet.dataset.text = rowsAsText(rows);
 
-    const home = toNumbers
-      ? chordAsDegree(keyReference(key).tonic + (keyIsMinor(key) ? 'm' : ''), key,
-        { roman, fromMinorTonic: tonic })
-      : keyReference(key).tonic + (keyIsMinor(key) ? 'm' : '');
-    answer.textContent = 'In ' + key + ', home is ' + home + '.';
+    const home = keyReference(key).tonic + (keyIsMinor(key) ? 'm' : '');
+    const number = chordAsDegree(home, key, { roman, fromMinorTonic: tonic });
+    answer.textContent = toNumbers
+      ? 'In ' + key + ', ' + home + ' is ' + number + '.'
+      : 'In ' + key + ', ' + number + ' is ' + home + '.';
   }
 
-  for (const control of page.querySelectorAll(
+  for (const control of document.querySelectorAll(
     'input[name="way"], input[name="style"], input[name="minor"]')) {
     control.addEventListener('change', () => {
       noteUsed();
@@ -1897,7 +1927,7 @@ function wireNumbers(page) {
   }
 
   chartBox.addEventListener('input', () => { noteUsed(); render(); });
-  keyPick.addEventListener('change', () => { noteUsed(); render(); });
+  keyPick.addEventListener('change', () => { touchedKey = true; noteUsed(); render(); });
   render();
 }
 
@@ -1905,10 +1935,10 @@ function wireNumbers(page) {
    The bits every tool page has
    ------------------------------------------------------------------ */
 
-function wireShared(page) {
-  const sheet = page.querySelector('#sheet');
-  const copy = page.querySelector('#copy');
-  const print = page.querySelector('#print');
+function wireShared() {
+  const sheet = document.querySelector('#sheet');
+  const copy = document.querySelector('#copy');
+  const print = document.querySelector('#print');
 
   if (copy !== null) {
     copy.addEventListener('click', async () => {
@@ -1940,13 +1970,14 @@ function wireShared(page) {
     }
   }
   // And on to the chord tool, which reads ?c= the same way this page did.
+  // Written onto the attribute rather than through URL, so the link stays the
+  // relative one it was and a flier code still reaches the page it points at.
   if (CODE) {
     for (const link of document.querySelectorAll('a[data-carry-code]')) {
-      try {
-        const onward = new URL(link.href);
-        onward.searchParams.set('c', CODE);
-        link.href = onward.toString();
-      } catch (_) { /* Same. */ }
+      const raw = link.getAttribute('href');
+      if (raw === null || /[?&]c=/.test(raw)) continue;
+      link.setAttribute('href',
+        raw + (raw.includes('?') ? '&' : '?') + 'c=' + encodeURIComponent(CODE));
     }
   }
 }
@@ -1955,10 +1986,10 @@ if (typeof document !== 'undefined') {
   const page = document.querySelector('[data-tool]');
   if (page !== null) {
     const which = page.dataset.tool;
-    if (which === 'transpose') wireTranspose(page);
-    if (which === 'capo') wireCapo(page);
-    if (which === 'numbers') wireNumbers(page);
-    wireShared(page);
+    if (which === 'transpose') wireTranspose();
+    if (which === 'capo') wireCapo();
+    if (which === 'numbers') wireNumbers();
+    wireShared();
     note('opened');
   }
 }
