@@ -1,6 +1,10 @@
 /* The cases the app's own tests hold, run against the port.
 
-   Run with: deno test tools.test.js
+   Run with: deno test --allow-read tools.test.js
+
+   The read permission is for the last three cases only. They open the three
+   pages and check that the song in each box is still the song the page
+   promises, so an example edited by hand cannot quietly stop being true.
 
    Almost everything here came across from E:/colabroom/wt/read-main/test —
    music_reference_test.dart, written_like_musicians_test.dart,
@@ -14,12 +18,12 @@
    one four-line assert is cheaper than a version of anything. */
 
 import {
-  GUITAR, UKULELE,
+  GUITAR, KEY_CHOICES, UKULELE,
   capoChart, capoLine, capoThatHelps, chartCapoFrets, chartKey, chordAsDegree,
   chordAsPlayed, chordDisplay, degreeAsChord, isChordName, isDegreeName,
-  keyAsPlayed, keyIsMinor, keyReference, keyUsesFlats, layoutChart, noteName,
-  openAtTheNut, pitchOf, readChart, rowsAsText, semitonesBetweenKeys,
-  spellInKey, transposeChord,
+  keyAsPlayed, keyIsMinor, keyReference, keyRootPitch, keyUsesFlats,
+  layoutChart, noteName, openAtTheNut, pitchOf, readChart, rowsAsText,
+  semitonesBetweenKeys, spellInKey, transposeChord,
 } from './tools.js';
 
 function eq(actual, expected, because) {
@@ -793,6 +797,46 @@ Deno.test('a chart pasted out of a web page keeps its columns', () => {
   // ones, and every column here is counted in characters.
   const chart = 'G\u00a0\u00a0\u00a0\u00a0C\nla la';
   eq(round(chart, 0, 'G'), 'G    C\nla la');
+});
+
+Deno.test('a chart written with the real flat and sharp signs is read', () => {
+  // The prose on these three pages prints chords as B♭ and F♯m, so a visitor
+  // who copies a line out of the page and pastes it into the box must not get
+  // it handed back unmoved and unmentioned. Both signs are one character, so
+  // the columns hold.
+  eq(readChart('B♭  E♭  Gm').chords, ['Bb', 'Eb', 'Gm']);
+  eq(round('B♭  E♭  Gm', 2, 'Bb'), 'C   F   Am');
+  eq(readChart('F♯m  C♯m').chords, ['F#m', 'C#m']);
+  // Over words, where the column arithmetic is the thing that can break.
+  eq(round('B♭      E♭\nEvery road out', 0, 'Bb'), 'Bb      Eb\nEvery road out');
+});
+
+Deno.test('a labelled row of chords is chords, not the words above it', () => {
+  // "Intro: G C D" under a bare row of chords was read as the lyrics that row
+  // sat over, and came back in the old key while everything above it moved —
+  // a chart half transposed, with nothing said. brought_chart.dart has the
+  // same gap; there it costs a mis-drawn line.
+  eq(round('| G | C | D7 | G |\nIntro: G  C  D', 2, 'G'),
+    '| A | D | E7 | A |\nIntro: A  D  E');
+  // A real line of words under a real row of chords still is one.
+  eq(round('G          C\nWaiting on the light', 2, 'G'),
+    'A          D\nWaiting on the light');
+  // And a label over words is still a label over words.
+  eq(round('Verse: the long way round again', 2, 'G'),
+    'Verse: the long way round again');
+});
+
+Deno.test('every key in the list is spelled the way the tool spells it', () => {
+  // Pick "C# major" and be told "Now in Db" on the next line and it is the
+  // dropdown that is wrong, not the arithmetic. `keyUsesFlats` decides; the
+  // list has to agree with it.
+  for (const choice of KEY_CHOICES) {
+    const root = choice.split(' ')[0];
+    eq(noteName(keyRootPitch(choice), keyUsesFlats(choice)), root, choice);
+    // And the name the tool writes when it moves nothing is the same name.
+    eq(keyAsPlayed(choice.replace(/ major$/, ''), 0).split(' ')[0], root, choice);
+  }
+  eq(KEY_CHOICES.length, 24);
 });
 
 Deno.test('numbers can be read off a chart as well as written onto one', () => {

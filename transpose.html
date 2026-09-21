@@ -55,6 +55,11 @@
 select:focus-visible, button:focus-visible, textarea:focus-visible,
 .seg input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
 
+/* The browser's own rule for [hidden] is display: none, and any author rule
+   that sets display beats it — .seg below sets flex. Without this line a row
+   with the attribute on it stays on screen. */
+[hidden] { display: none !important; }
+
 /* Radios underneath, so a keyboard gets a radio group and a screen reader
    gets a named set rather than a row of buttons that say nothing. */
 .seg { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35rem; }
@@ -74,6 +79,10 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
   font-family: var(--mono); font-size: .8125rem; line-height: 1.75;
   padding: 1rem; white-space: pre; overflow-x: auto; tab-size: 8;
 }
+/* iOS Safari zooms the whole page whenever an input under 16px takes focus,
+   and with wrap="off" the zoomed page then pans sideways — on the one control
+   a thumb goes to first. */
+@media (pointer: coarse) { .chartbox { font-size: 1rem; } }
 .answer {
   font-family: var(--display); font-size: clamp(1.25rem, 4.5vw, 1.7rem);
   font-weight: 800; color: var(--text); margin: 0;
@@ -147,6 +156,11 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
 }
 </style>
 
+<!-- site.css holds every .reveal section at opacity 0 until reveal.js adds
+     .in, so with JavaScript switched off the explanations below the tool
+     would be a blank page. This puts them back. -->
+<noscript><style>.reveal { opacity: 1; transform: none; }</style></noscript>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -155,43 +169,15 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
   "url": "https://colabroom.com/transpose.html",
   "applicationCategory": "MusicApplication",
   "operatingSystem": "Web",
-  "browserRequirements": "Requires JavaScript. Nothing is uploaded.",
+  "browserRequirements": "Requires JavaScript. Your chart is not uploaded.",
   "isAccessibleForFree": true,
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "publisher": { "@type": "Organization", "name": "CoLabRoom", "url": "https://colabroom.com/" }
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  "name": "How to transpose a chord chart into another key",
-  "totalTime": "PT1M",
-  "tool": [{ "@type": "HowToTool", "name": "A chord chart" }],
-  "step": [
-    {
-      "@type": "HowToStep",
-      "name": "Paste your chart",
-      "text": "Paste the chart into the box. Chords over the words, ChordPro brackets or a bare row of chords all read the same."
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Say where it is and where it is going",
-      "text": "Pick the key it is in and the key you want. If the chart names its key, that is filled in for you."
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Put a capo on, if you want one",
-      "text": "Choose a fret and the shapes come down by that many semitones. The line above the chart names the shapes and the key the band still hears."
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Copy or print it",
-      "text": "The chart comes back in the shape you pasted it, with the words where they were."
-    }
-  ]
-}
-</script>
+<!-- No HowTo block. Google retired the rich result, the SEO plan says skip it
+     and the guardian agrees — and the only way to write one was with a
+     totalTime, which is a claim about speed this site does not make. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -226,7 +212,7 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
       "name": "Is my chart sent anywhere?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. The arithmetic runs in your browser and the chart never leaves the page. There is no account and nothing is stored."
+        "text": "No. The arithmetic runs in your browser and the chart never leaves the page. There is no account."
       }
     }
   ]
@@ -266,7 +252,7 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
 
     <noscript>
       <p class="problem">This one needs JavaScript switched on — the arithmetic
-      happens here in the page. Either way nothing is sent anywhere.</p>
+      happens here in the page. Your chart is not sent anywhere either way.</p>
     </noscript>
 
     <div class="field no-print">

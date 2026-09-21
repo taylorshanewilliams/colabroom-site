@@ -1,10 +1,16 @@
 /* The three free tools: transpose, capo, Nashville numbers.
 
-   Everything here is arithmetic on note names. Nothing is sent anywhere,
-   nothing is stored, and there is no network call in any of it — the chart
-   you paste never leaves the page. (The two anonymous counters at the bottom
-   of this file do speak to the server. They carry a step name and the arrival
-   code from the link you came in on, and nothing about your chart.)
+   Everything here is arithmetic on note names. The chart you paste is read,
+   moved and drawn in the page and is never sent anywhere.
+
+   Two things at the bottom of this file do speak to the server, and the
+   pages say so rather than claiming otherwise: the anonymous step counters,
+   which carry a step name, a page name and the arrival code from the link
+   you came in on and nothing about your chart; and `localStorage`, which
+   keeps that arrival code so a later visit still knows which board it came
+   from. So every sentence these pages print about privacy is scoped to the
+   chart — "the chart never leaves your browser" — and none of them is the
+   absolute kind, because the absolute kind would not be true.
 
    It is a port of the Dart the app already runs, and the port is deliberate
    rather than a rewrite: the same tables, the same rules, the same edge cases
@@ -1038,11 +1044,45 @@ export const CHART_LIMIT = 65536;
    alignment with non-breaking spaces, because HTML collapses ordinary ones.
    Every column here is counted in characters and one of these is one
    character. The zero-width ones are taken out instead: they occupy no
-   column. */
+   column.
+
+   Written as code points rather than as the characters themselves. They are
+   invisible by definition, so as literals nobody can review the line, and one
+   editor set to strip zero-width characters on save would silently delete
+   half of it. */
+const chars = (...points) => points.map((point) => String.fromCodePoint(point)).join('');
+
+const ZERO_WIDTH_CHARS = chars(
+  0x200B, // zero-width space
+  0x200C, // zero-width non-joiner
+  0x200D, // zero-width joiner
+  0xFEFF, // byte order mark, which leads a file pasted whole
+);
+
+const WIDE_SPACE_CHARS = chars(
+  0x00A0, // no-break space — how a chart copied out of a web page or an
+          // email keeps the columns HTML would otherwise collapse
+  0x1680,
+  0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005,
+  0x2006, 0x2007, 0x2008, 0x2009, 0x200A,
+  0x202F, 0x205F,
+  0x3000, // ideographic space
+);
+
+const ZERO_WIDTH = new RegExp('[' + ZERO_WIDTH_CHARS + ']', 'g');
+const WIDE_SPACE = new RegExp('[' + WIDE_SPACE_CHARS + ']', 'g');
+
 function plainSpaces(source) {
-  return source
-    .replace(/[​‌‍﻿]/g, '')
-    .replace(/[   -   　]/g, ' ');
+  return source.replace(ZERO_WIDTH, '').replace(WIDE_SPACE, ' ');
+}
+
+/* A chart written with the real signs — B♭, F♯m — is a chart. This page's own
+   prose prints chords that way, so somebody who copies a line out of it and
+   pastes it back into the box must not get their chords handed back unmoved
+   and unmentioned. Both signs are one character, exactly like the b and the #
+   they stand in for, so no column moves. */
+function plainAccidentals(source) {
+  return source.replace(/♭/g, 'b').replace(/♯/g, '#');
 }
 
 /* Tabs written out as spaces to a stop of eight, so a column means the same
@@ -1163,6 +1203,13 @@ function isWordsUnder(line, isName) {
   if (looksLikeTab(trimmed)) return false;
   if (factIn(trimmed) !== null) return false;
   if (isChordLine(trimmed, isName)) return false;
+  /* "Intro: G  C  D" is a row of chords with a label on it, not the words a
+     row above belongs over. The app has the same gap and pays a mis-drawn
+     line for it; here the cost would be a chart half in the new key and half
+     in the old one with nothing said, which is the worst thing a transposer
+     can do. Reported for the app as well. */
+  const labelled = LABELLED.exec(trimmed);
+  if (labelled !== null && isChordLine(labelled[2].trim(), isName)) return false;
   // Words that already carry their own chords are not waiting for a row of
   // them above; the row above is an intro or a turnaround of its own.
   if (trimmed.includes('[') && trimmed.includes(']')) return false;
@@ -1250,7 +1297,7 @@ export function readChart(source, options = {}) {
   const isRow = options.degrees === true
     ? (line) => isDegreeLine(line)
     : (line) => isChordLine(line, isName);
-  const raw = plainSpaces(String(source))
+  const raw = plainAccidentals(plainSpaces(String(source)))
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
     .split('\n');
@@ -1537,26 +1584,53 @@ export function rowsAsText(rows) {
 
    Copied from chords.js rather than shared, because the shared count.js that
    both will load is in the other open pull request. When that lands, these
-   twenty lines come out and the pages load count.js instead. */
+   thirty lines come out and the pages load count.js instead — and this copy
+   is written to behave the way that file does, so nothing changes on the day
+   it is swapped in. */
 const ENDPOINT = 'https://gzcoclsfvazfhcheefhz.supabase.co/functions/v1/analyze-public';
 
-const CODE = (() => {
+/* Which of the three pages this is, said by the page rather than read off the
+   address: GitHub Pages serves both /capo and /capo.html, and a 404 is served
+   at whatever was mistyped. */
+const PAGE = (() => {
+  // The arithmetic above is imported by `deno test`, where there is no page.
+  if (typeof document === 'undefined') return '';
+  const tag = document.querySelector('[data-tool]');
+  const name = tag === null ? '' : (tag.dataset.tool ?? '');
+  return /^[a-z0-9-]{1,24}$/.test(name) ? name : '';
+})();
+
+/* `fresh` says the code was on the address bar of *this* load — the moment
+   somebody actually walked through that door. A code read back out of storage
+   is the same person still reading, which is a different thing. */
+const ARRIVAL = (() => {
   try {
     const raw = new URL(location.href).searchParams.get('c');
     if (raw && /^[a-z0-9-]{1,32}$/i.test(raw)) {
       localStorage.setItem('colabroom_code', raw.toLowerCase());
-      return raw.toLowerCase();
+      return { code: raw.toLowerCase(), fresh: true };
     }
-    return localStorage.getItem('colabroom_code') || '';
+    return { code: localStorage.getItem('colabroom_code') || '', fresh: false };
   } catch (_) {
-    return '';
+    return { code: '', fresh: false };
   }
 })();
+const CODE = ARRIVAL.code;
 
-function note(step) {
+/* Add one to a daily counter.
+
+   `page` rides along so the counters can be split per page. The function
+   ignores it today — the step allowlist is a check constraint in migration
+   0099 and only knows the eleven steps the chord tool records — so until the
+   endpoint reads it, an `opened` from here is added to the chord tool's own.
+   Sending it now means the day the endpoint learns to read it, nothing here
+   has to be republished. count.js on the other branch sends it for the same
+   reason. */
+function send(step, stepCode) {
   try {
     fetch(ENDPOINT + '/note?step=' + encodeURIComponent(step) +
-      (CODE ? '&c=' + encodeURIComponent(CODE) : ''), {
+      (stepCode ? '&c=' + encodeURIComponent(stepCode) : '') +
+      (PAGE ? '&page=' + encodeURIComponent(PAGE) : ''), {
       cache: 'no-store',
       keepalive: true,
     }).catch(() => {});
@@ -1564,6 +1638,10 @@ function note(step) {
     /* Measurement never breaks the page it measures. */
   }
 }
+
+/* The ordinary shape, used by everything that happens after the page is up:
+   the code it was found on rides along. */
+function note(step) { send(step, CODE); }
 
 const escapeHtml = (text) => text
   .replace(/&/g, '&amp;')
@@ -1583,19 +1661,33 @@ function rowsAsHtml(rows) {
     .join('\n');
 }
 
-function draw(target, rows) {
+/* The chords turn over when the key, the capo or the instrument changes —
+   the thing that moved is the thing that should move. They do not turn over
+   while somebody types the second verse, which is the same redraw and would
+   set the whole sheet flipping on every keystroke. */
+function draw(target, rows, animate) {
   target.innerHTML = rowsAsHtml(rows);
-  // Restarting the animation needs the class off, a reflow, and the class on.
   target.classList.remove('flip');
+  if (animate === false) return;
+  // Restarting the animation needs the class off, a reflow, and the class on.
   void target.offsetWidth;
   target.classList.add('flip');
 }
 
-const KEY_CHOICES = [
-  'C major', 'C# major', 'D major', 'Eb major', 'E major', 'F major',
+/* Every key, named the way this file then writes it.
+ *
+ * Which of two names a key gets is `keyUsesFlats`, and the list has to agree
+ * with it or the tool contradicts its own dropdown on the next line: pick
+ * "C# major" and every chord comes back Db Gb Ab. So the three that disagreed
+ * are named the way the arithmetic names them — Db major, and the two
+ * six-accidental minors that the rule deliberately leaves sharp. The test
+ * "every key in the list is spelled the way the tool spells it" holds the
+ * two together. Nothing here is matched by name: `matchKey` works by pitch. */
+export const KEY_CHOICES = [
+  'C major', 'Db major', 'D major', 'Eb major', 'E major', 'F major',
   'F# major', 'G major', 'Ab major', 'A major', 'Bb major', 'B major',
-  'C minor', 'C# minor', 'D minor', 'Eb minor', 'E minor', 'F minor',
-  'F# minor', 'G minor', 'Ab minor', 'A minor', 'Bb minor', 'B minor',
+  'C minor', 'C# minor', 'D minor', 'D# minor', 'E minor', 'F minor',
+  'F# minor', 'G minor', 'G# minor', 'A minor', 'Bb minor', 'B minor',
 ];
 
 function fillKeys(select, withUnknown) {
@@ -1638,79 +1730,161 @@ function wireTranspose() {
 
   fillKeys(fromKey, true);
   fillKeys(toKey, false);
-  toKey.value = 'A major';
+
+  /* The example in the box is in G, and a tool that opens showing the chart
+     it was handed has not shown anybody anything. So it opens already moved,
+     two semitones up, to the key the page's own test names. */
+  const OPENS_IN = 'A major';
 
   let chart = null;
   let chartCapo = 0;
   let touchedFrom = false;
 
-  function reread() {
+  /* How far the chords move, in semitones, and the one thing the page is
+     built on. The "put it in" box is that number said out loud in the name of
+     a key, which it can only do once somebody has said what key the chart is
+     in — so the number is kept here rather than read back out of two
+     dropdowns, and the − and + buttons work whether a key is known or not. */
+  let move = 0;
+
+  /* What the chart itself said last time it was read. Only a change in these
+     moves the controls: without them, typing one letter into the words would
+     snatch back a capo the visitor had just chosen, and the whole chart would
+     jump under their hands. */
+  let lastSaid;
+  let lastCapo = -1;
+
+  function reread(animate) {
     chart = readChart(chartBox.value.slice(0, CHART_LIMIT));
     chartCapo = chartCapoFrets(chart);
     const said = chartKey(chart);
-    if (said !== null && !touchedFrom) {
+
+    if (said !== lastSaid || chartCapo !== lastCapo) {
       // The chart's key line is what the shapes are written in; with a capo
-      // on, the song sounds that many semitones higher.
-      fromKey.value = matchKey(keyAsPlayed(said, chartCapo));
-      capo.value = String(chartCapo);
+      // on, the song sounds that many semitones higher. A chart that does not
+      // say goes back to "Not sure" rather than keeping the last chart's key,
+      // which would move somebody's song by the wrong amount without a word.
+      if (!touchedFrom) {
+        fromKey.value = said === null ? '' : matchKey(keyAsPlayed(said, chartCapo));
+      }
+      // A different song is a different question. Somebody who pasted a new
+      // chart over the old one must not have the last one's "put it in A"
+      // quietly applied to it — that is the same silent wrong answer as
+      // keeping the last chart's key, arriving by the other door.
+      if (said !== lastSaid) move = 0;
+      if (chartCapo !== lastCapo) capo.value = String(chartCapo);
+      lastSaid = said;
+      lastCapo = chartCapo;
     }
-    note1.textContent = said === null
-      ? ''
-      : chartCapo > 0
-        ? 'Your chart says it is in ' + said + ' with a capo on ' + chartCapo +
-          ', so it sounds in ' + keyAsPlayed(said, chartCapo) + '.'
-        : 'Your chart says it is in ' + said + '.';
-    render();
+
+    render(animate);
   }
 
-  function render() {
+  /* "up 2 semitones", "down 1 semitone" — the only way to say where a chart
+     went when nobody has said what key it started in, and the answer the − and
+     + buttons give on their own. */
+  function movedBy(semitones) {
+    if (semitones === 0) return 'where you wrote them';
+    return (semitones > 0 ? 'up ' : 'down ') + Math.abs(semitones) +
+      (Math.abs(semitones) === 1 ? ' semitone' : ' semitones');
+  }
+
+  /* With a capo on, the shapes and the song go opposite ways, so both are
+     said — the same two halves the named-key line has, without the names. */
+  function unnamedAnswer(move, delta, fret) {
+    if (fret > 0) {
+      return 'Capo ' + fret + ' · shapes ' + movedBy(delta) +
+        ' · sounds ' + movedBy(move);
+    }
+    return move === 0 ? 'Nothing moved yet.' : 'Moved ' + movedBy(move) + '.';
+  }
+
+  function render(animate) {
     if (chart === null) return;
     const sounding = fromKey.value;
+    const known = sounding !== '';
     const fret = Number(capo.value);
-    const move = sounding === '' ? 0 : semitonesBetweenKeys(sounding, toKey.value);
+    // Without a key there is nothing for "put it in" to name, so it says so
+    // rather than sitting there looking like a control that works.
+    toKey.disabled = !known;
+    if (known) toKey.value = matchKey(keyAsPlayed(sounding, move));
+
     // The chart's chords are written under whatever capo the chart declared,
     // so they move by the difference between that capo and this one, plus
     // wherever the song is going.
     const delta = move + chartCapo - fret;
     const said = chartKey(chart);
+
+    // Said here rather than in reread, so the moment somebody answers the
+    // question the line stops asking it.
+    note1.textContent = said !== null
+      ? chartCapo > 0
+        ? 'Your chart says it is in ' + said + ' with a capo on ' + chartCapo +
+          ', so it sounds in ' + keyAsPlayed(said, chartCapo) + '.'
+        : 'Your chart says it is in ' + said + '.'
+      : known
+        ? ''
+        : 'Your chart does not say what key it is in. Pick it above, or just ' +
+          'step it up and down.';
+
     // The spelling follows the key the shapes end up written in, which is the
     // chart's own written key moved by the same amount its chords were.
-    const writtenFrom = said ?? (sounding === '' ? null : transposeChord(sounding, -chartCapo));
+    const writtenFrom = said ?? (known ? transposeChord(sounding, -chartCapo) : null);
 
     const facts = { capo: fret };
     if (said !== null) facts.key = keyAsPlayed(said, delta);
     const rows = layoutChart(chart, (chord) => chordAsPlayed(chord, delta, writtenFrom), facts);
-    draw(sheet, rows);
+    draw(sheet, rows, animate);
     sheet.dataset.text = rowsAsText(rows);
     // "G major shapes · sounds in A major" is the same sentence twice over,
     // so the word major comes off before the line is built.
     const named = sounding.replace(/ major$/, '');
-    answer.textContent = sounding === ''
-      ? (fret > 0 ? 'Capo ' + fret : 'Moved by ' + delta + ' semitones')
+    answer.textContent = !known
+      ? unnamedAnswer(move, delta, fret)
       : fret > 0
         ? capoLine(named, fret, move)
         : 'Now in ' + capoLine(named, 0, move) + '.';
   }
 
-  for (const control of [fromKey, toKey, capo]) {
-    control.addEventListener('change', () => {
-      if (control === fromKey) touchedFrom = true;
-      noteUsed();
-      render();
-    });
+  fromKey.addEventListener('change', () => {
+    touchedFrom = true;
+    noteUsed();
+    // The key a chart is in is a fact about the chart; the key it is going to
+    // is what the visitor asked for. Correcting the fact keeps the wish — but
+    // only when there was a wish to keep, which there was not while the box
+    // was sitting there disabled.
+    if (fromKey.value !== '' && !toKey.disabled) {
+      move = semitonesBetweenKeys(fromKey.value, toKey.value);
+    }
+    render(true);
+  });
+  toKey.addEventListener('change', () => {
+    noteUsed();
+    move = semitonesBetweenKeys(fromKey.value, toKey.value);
+    render(true);
+  });
+  capo.addEventListener('change', () => { noteUsed(); render(true); });
+
+  // Typing redraws but does not flip: the brief asked for chords that turn
+  // over as they change key, not as somebody types the second verse.
+  chartBox.addEventListener('input', () => { noteUsed(); reread(false); });
+
+  function step(by) {
+    noteUsed();
+    move += by;
+    // Twelve semitones is the same chords an octave away, so it wraps.
+    if (move >= 12) move -= 12;
+    if (move <= -12) move += 12;
+    render(true);
   }
-  chartBox.addEventListener('input', () => { noteUsed(); reread(); });
-  document.querySelector('#up').addEventListener('click', () => {
-    noteUsed();
-    toKey.value = matchKey(keyAsPlayed(toKey.value, 1));
-    render();
-  });
-  document.querySelector('#down').addEventListener('click', () => {
-    noteUsed();
-    toKey.value = matchKey(keyAsPlayed(toKey.value, -1));
-    render();
-  });
-  reread();
+  document.querySelector('#up').addEventListener('click', () => step(1));
+  document.querySelector('#down').addEventListener('click', () => step(-1));
+
+  reread(false);
+  if (fromKey.value !== '') {
+    move = semitonesBetweenKeys(fromKey.value, OPENS_IN);
+    render(false);
+  }
 }
 
 /** The name in the key list for a key that came back spelled another way. */
@@ -1748,7 +1922,7 @@ function wireCapo() {
     return chosen !== null && chosen.value === 'ukulele' ? UKULELE : GUITAR;
   }
 
-  function render() {
+  function render(animate) {
     const chart = readChart(chartBox.value.slice(0, CHART_LIMIT));
     const used = chart.chords;
     const found = capoThatHelps(used, reading);
@@ -1761,7 +1935,7 @@ function wireCapo() {
     const facts = { capo: already + fret };
     if (said !== null) facts.key = keyAsPlayed(said, -fret);
     const rows = layoutChart(chart, (chord) => chordAsPlayed(chord, -fret, said), facts);
-    draw(sheet, rows);
+    draw(sheet, rows, animate);
     sheet.dataset.text = rowsAsText(rows);
     chartNote.textContent = already > 0
       ? 'Your chart already has a capo on ' + already + ', so this one goes on top of it.'
@@ -1829,14 +2003,16 @@ function wireCapo() {
     radio.addEventListener('change', () => {
       reading = instrument();
       noteUsed();
-      render();
+      render(true);
       drawChart();
       showFullChart();
     });
   }
-  chartBox.addEventListener('input', () => { noteUsed(); render(); });
+  // Typing redraws but does not flip: the chords turn over when the answer
+  // changes, not while somebody types the second verse.
+  chartBox.addEventListener('input', () => { noteUsed(); render(false); });
   keyPick.addEventListener('change', () => { noteUsed(); drawChart(); });
-  render();
+  render(false);
   drawChart();
 }
 
@@ -1871,7 +2047,7 @@ function wireNumbers() {
     return chosen !== null && chosen.value === 'tonic';
   }
 
-  function render() {
+  function render(animate) {
     const toNumbers = way() === 'to-numbers';
     const chart = readChart(chartBox.value.slice(0, CHART_LIMIT), { degrees: !toNumbers });
 
@@ -1896,7 +2072,7 @@ function wireNumbers() {
     const rows = layoutChart(chart, (chord) => toNumbers
       ? chordAsDegree(chord, key, { roman, fromMinorTonic: tonic }) ?? chord
       : degreeAsChord(chord, key, { fromMinorTonic: tonic }) ?? chord);
-    draw(sheet, rows);
+    draw(sheet, rows, animate);
     sheet.dataset.text = rowsAsText(rows);
 
     const home = keyReference(key).tonic + (keyIsMinor(key) ? 'm' : '');
@@ -1911,7 +2087,7 @@ function wireNumbers() {
     control.addEventListener('change', () => {
       noteUsed();
       if (control.name === 'way') swapExample(control.value);
-      render();
+      render(true);
     });
   }
 
@@ -1926,9 +2102,11 @@ function wireNumbers() {
     if (direction === 'to-letters' && showing === letters) chartBox.value = chartBox.dataset.numbers;
   }
 
-  chartBox.addEventListener('input', () => { noteUsed(); render(); });
-  keyPick.addEventListener('change', () => { touchedKey = true; noteUsed(); render(); });
-  render();
+  // Typing redraws but does not flip: the chords turn over when the key or
+  // the notation changes, not while somebody types the second verse.
+  chartBox.addEventListener('input', () => { noteUsed(); render(false); });
+  keyPick.addEventListener('change', () => { touchedKey = true; noteUsed(); render(true); });
+  render(false);
 }
 
 /* ------------------------------------------------------------------
@@ -1955,7 +2133,10 @@ function wireShared() {
   }
   if (print !== null) print.addEventListener('click', () => window.print());
 
+  // The "Keep it with the song" card is both a card and a link into the app.
+  // Counted once, as the app click, which is the one that matters.
   for (const link of document.querySelectorAll('.onward')) {
+    if ((link.getAttribute('href') ?? '').includes('app.colabroom.com')) continue;
     link.addEventListener('click', () => note('clicked_onward'));
   }
   for (const link of document.querySelectorAll('a[href*="app.colabroom.com"]')) {
@@ -1990,6 +2171,11 @@ if (typeof document !== 'undefined') {
     if (which === 'capo') wireCapo();
     if (which === 'numbers') wireNumbers();
     wireShared();
-    note('opened');
+    /* The code only rides on this one when it was on the address bar of this
+       load. A step carrying a code is written to `arrivals`, and attaching a
+       remembered code here would mean one person who scans a flier and then
+       reads three pages records three arrivals for that board. The report
+       exists to compare boards; this is the line that keeps it able to. */
+    send('opened', ARRIVAL.fresh ? CODE : '');
   }
 }

@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nashville number system — letters to 1 4 5 — CoLabRoom</title>
-<meta name="description" content="Turn a chord chart into Nashville numbers or Roman numerals, and back again. Both ways of counting a minor song. Free, and nothing leaves your browser.">
+<meta name="description" content="Turn a chord chart into Nashville numbers or Roman numerals, and back again. Both ways of counting a minor song. Free, and the chart never leaves the page.">
 <meta property="og:title" content="G C D is 1 4 5.">
-<meta property="og:description" content="Turn a chord chart into Nashville numbers or Roman numerals, and back again. No account. Nothing leaves the page.">
+<meta property="og:description" content="Turn a chord chart into Nashville numbers or Roman numerals, and back again. No account. The chart never leaves the page.">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +21,7 @@
   <meta property="og:image:alt" content="CoLabRoom — songwriting for musicians who aren't in the same room.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Nashville number system — letters to 1 4 5 — CoLabRoom">
-  <meta name="twitter:description" content="Turn a chord chart into Nashville numbers or Roman numerals, and back again. No account. Nothing leaves the page.">
+  <meta name="twitter:description" content="Turn a chord chart into Nashville numbers or Roman numerals, and back again. No account. The chart never leaves the page.">
   <meta name="twitter:image" content="https://colabroom.com/share.png">
   <meta name="theme-color" content="#06101F">
 
@@ -55,6 +55,12 @@
 select:focus-visible, button:focus-visible, textarea:focus-visible,
 .seg input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
 
+/* The browser's own rule for [hidden] is display: none, and any author rule
+   that sets display beats it — .seg below sets flex. Without this line the
+   minor-key row stays on screen with the attribute set, which is the one
+   thing the code comment beside it says must not happen. */
+[hidden] { display: none !important; }
+
 /* Radios underneath, so a keyboard gets a radio group and a screen reader
    gets a named set rather than a row of buttons that say nothing. */
 .seg { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35rem; }
@@ -74,6 +80,10 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
   font-family: var(--mono); font-size: .8125rem; line-height: 1.75;
   padding: 1rem; white-space: pre; overflow-x: auto; tab-size: 8;
 }
+/* iOS Safari zooms the whole page whenever an input under 16px takes focus,
+   and with wrap="off" the zoomed page then pans sideways — on the one control
+   a thumb goes to first. */
+@media (pointer: coarse) { .chartbox { font-size: 1rem; } }
 .answer {
   font-family: var(--display); font-size: clamp(1.25rem, 4.5vw, 1.7rem);
   font-weight: 800; color: var(--text); margin: 0;
@@ -136,6 +146,12 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
 }
 </style>
 
+<!-- site.css holds every .reveal section at opacity 0 until reveal.js adds
+     .in, so with JavaScript switched off the cheat sheet further down would
+     be invisible on screen — which is exactly what this page promises still
+     works. This puts it back. -->
+<noscript><style>.reveal { opacity: 1; transform: none; }</style></noscript>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -150,36 +166,9 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
   "publisher": { "@type": "Organization", "name": "CoLabRoom", "url": "https://colabroom.com/" }
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  "name": "How to write a chord chart in Nashville numbers",
-  "totalTime": "PT1M",
-  "step": [
-    {
-      "@type": "HowToStep",
-      "name": "Choose which way you are going",
-      "text": "Letters to numbers if you have a chart, numbers to letters if somebody handed you one in numbers."
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Say what key the song is in",
-      "text": "Everything is counted from there. Nothing is guessed from the chords, because a guessed key would silently renumber the whole page."
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Pick numbers or Roman numerals",
-      "text": "Nashville writes minor as a dash, so A minor in G is 2 dash. Roman numerals say it in the case instead: ii."
-    },
-    {
-      "@type": "HowToStep",
-      "name": "For a minor song, say which note it counts from",
-      "text": "The relative major by default, where A minor reads 6 dash, or the minor tonic, where the same song reads 1 dash. Both are in daily use."
-    }
-  ]
-}
-</script>
+<!-- No HowTo block. Google retired the rich result, the SEO plan says skip it
+     and the guardian agrees — and the only way to write one was with a
+     totalTime, which is a claim about speed this site does not make. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -251,7 +240,7 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
 
     <noscript>
       <p class="problem">This one needs JavaScript switched on — the arithmetic
-      happens here in the page. Either way nothing is sent anywhere.</p>
+      happens here in the page. Your chart is not sent anywhere either way.</p>
     </noscript>
 
     <fieldset class="seg no-print">

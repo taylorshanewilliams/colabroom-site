@@ -55,6 +55,11 @@
 select:focus-visible, button:focus-visible, textarea:focus-visible,
 .seg input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
 
+/* The browser's own rule for [hidden] is display: none, and any author rule
+   that sets display beats it — .seg below sets flex. Without this line a row
+   with the attribute on it stays on screen. */
+[hidden] { display: none !important; }
+
 /* Radios underneath, so a keyboard gets a radio group and a screen reader
    gets a named set rather than a row of buttons that say nothing. */
 .seg { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35rem; }
@@ -74,6 +79,10 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
   font-family: var(--mono); font-size: .8125rem; line-height: 1.75;
   padding: 1rem; white-space: pre; overflow-x: auto; tab-size: 8;
 }
+/* iOS Safari zooms the whole page whenever an input under 16px takes focus,
+   and with wrap="off" the zoomed page then pans sideways — on the one control
+   a thumb goes to first. */
+@media (pointer: coarse) { .chartbox { font-size: 1rem; } }
 .answer {
   font-family: var(--display); font-size: clamp(1.25rem, 4.5vw, 1.7rem);
   font-weight: 800; color: var(--text); margin: 0;
@@ -148,6 +157,15 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
 }
 </style>
 
+<!-- site.css holds every .reveal section at opacity 0 until reveal.js adds
+     .in, so with JavaScript switched off the printable chart further down
+     would be invisible on screen — which is exactly what this page promises
+     still works. This puts it back. -->
+<noscript><style>
+.reveal { opacity: 1; transform: none; }
+.needs-js { display: none; }
+</style></noscript>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -162,40 +180,9 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
   "publisher": { "@type": "Organization", "name": "CoLabRoom", "url": "https://colabroom.com/" }
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  "name": "How to work out which fret to put a capo on",
-  "totalTime": "PT1M",
-  "tool": [
-    { "@type": "HowToTool", "name": "A capo" },
-    { "@type": "HowToTool", "name": "A guitar or a ukulele" }
-  ],
-  "step": [
-    {
-      "@type": "HowToStep",
-      "name": "Say what you play",
-      "text": "Choose guitar or ukulele. A ukulele has different open shapes and a shorter neck, so it gets a different answer."
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Paste the chords you have",
-      "text": "A row of chord names, a chart with words, or ChordPro brackets all read the same."
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Read the fret and the shapes",
-      "text": "It counts your own chords at every fret and picks the one that leaves the most of them on open shapes and the fewest on barres. If no capo helps, it says so."
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Print the chart",
-      "text": "The full chart underneath gives every key and the frets that put it on open shapes, for the instrument you chose."
-    }
-  ]
-}
-</script>
+<!-- No HowTo block. Google retired the rich result, the SEO plan says skip it
+     and the guardian agrees — and the only way to write one was with a
+     totalTime, which is a claim about speed this site does not make. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -269,8 +256,8 @@ select:focus-visible, button:focus-visible, textarea:focus-visible,
 
     <noscript>
       <p class="problem">The chord box needs JavaScript switched on — the
-      arithmetic happens here in the page, and nothing is sent anywhere either
-      way. The printable chart further down works without it.</p>
+      arithmetic happens here in the page, and your chords are not sent
+      anywhere either way. The printable chart further down works without it.</p>
     </noscript>
 
     <fieldset class="seg no-print">
@@ -308,7 +295,10 @@ Goes past your door</textarea>
     </div>
   </section>
 
-  <section class="moment reveal">
+  <!-- Every part of this one is drawn by the script, so with JavaScript off it
+       would be a heading over an empty dropdown. The printable chart further
+       down is the half that works without it. -->
+  <section class="moment reveal needs-js">
     <div class="eyebrow">Or just a key</div>
     <h2>Every fret that puts your key on open shapes.</h2>
     <div class="toolbar no-print">
@@ -329,6 +319,11 @@ Goes past your door</textarea>
       same song, same key, three easier chords. That is the whole trick, and it
       is why the answer above names the shapes you play and the key the room
       hears.
+    </p>
+    <p class="lede">
+      Which fret? The one that leaves the most of your own chords on open
+      shapes and the fewest on barres. That depends on the chords in your song,
+      not just its key — so it counts yours rather than reading a table.
     </p>
   </section>
 
@@ -355,7 +350,7 @@ Goes past your door</textarea>
 
     <div class="capo-full" id="full-guitar">
       <div class="capo-line"><b>C major</b><span>Capo 3 → A</span><span>Capo 5 → G</span></div>
-      <div class="capo-line"><b>C# major</b><span>Capo 1 → C</span><span>Capo 4 → A</span><span>Capo 6 → G</span></div>
+      <div class="capo-line"><b>Db major</b><span>Capo 1 → C</span><span>Capo 4 → A</span><span>Capo 6 → G</span></div>
       <div class="capo-line"><b>D major</b><span>Capo 2 → C</span><span>Capo 5 → A</span><span>Capo 7 → G</span></div>
       <div class="capo-line"><b>Eb major</b><span>Capo 1 → D</span><span>Capo 3 → C</span><span>Capo 6 → A</span></div>
       <div class="capo-line"><b>E major</b><span>Capo 2 → D</span><span>Capo 4 → C</span><span>Capo 7 → A</span></div>
@@ -369,12 +364,12 @@ Goes past your door</textarea>
       <div class="capo-line"><b>C minor</b><span>Capo 3 → Am</span></div>
       <div class="capo-line"><b>C# minor</b><span>Capo 4 → Am</span></div>
       <div class="capo-line"><b>D minor</b><span>Capo 5 → Am</span></div>
-      <div class="capo-line"><b>Eb minor</b><span>Capo 1 → Dm</span><span>Capo 6 → Am</span></div>
+      <div class="capo-line"><b>D# minor</b><span>Capo 1 → Dm</span><span>Capo 6 → Am</span></div>
       <div class="capo-line"><b>E minor</b><span>Capo 2 → Dm</span><span>Capo 7 → Am</span></div>
       <div class="capo-line"><b>F minor</b><span>Capo 1 → Em</span><span>Capo 3 → Dm</span></div>
       <div class="capo-line"><b>F# minor</b><span>Capo 2 → Em</span><span>Capo 4 → Dm</span></div>
       <div class="capo-line"><b>G minor</b><span>Capo 3 → Em</span><span>Capo 5 → Dm</span></div>
-      <div class="capo-line"><b>Ab minor</b><span>Capo 4 → Em</span><span>Capo 6 → Dm</span></div>
+      <div class="capo-line"><b>G# minor</b><span>Capo 4 → Em</span><span>Capo 6 → Dm</span></div>
       <div class="capo-line"><b>A minor</b><span>Capo 5 → Em</span><span>Capo 7 → Dm</span></div>
       <div class="capo-line"><b>Bb minor</b><span>Capo 1 → Am</span><span>Capo 6 → Em</span></div>
       <div class="capo-line"><b>B minor</b><span>Capo 2 → Am</span><span>Capo 7 → Em</span></div>
@@ -382,7 +377,7 @@ Goes past your door</textarea>
 
     <div class="capo-full" id="full-ukulele" hidden>
       <div class="capo-line"><b>C major</b><span>Capo 3 → A</span><span>Capo 5 → G</span></div>
-      <div class="capo-line"><b>C# major</b><span>Capo 1 → C</span><span>Capo 4 → A</span></div>
+      <div class="capo-line"><b>Db major</b><span>Capo 1 → C</span><span>Capo 4 → A</span></div>
       <div class="capo-line"><b>D major</b><span>Capo 2 → C</span><span>Capo 5 → A</span></div>
       <div class="capo-line"><b>Eb major</b><span>Capo 1 → D</span><span>Capo 3 → C</span></div>
       <div class="capo-line"><b>E major</b><span>Capo 2 → D</span><span>Capo 4 → C</span></div>
@@ -396,12 +391,12 @@ Goes past your door</textarea>
       <div class="capo-line"><b>C minor</b><span>Capo 3 → Am</span><span>Capo 5 → Gm</span></div>
       <div class="capo-line"><b>C# minor</b><span>Capo 1 → Cm</span><span>Capo 4 → Am</span></div>
       <div class="capo-line"><b>D minor</b><span>Capo 1 → C#m</span><span>Capo 2 → Cm</span><span>Capo 5 → Am</span></div>
-      <div class="capo-line"><b>Eb minor</b><span>Capo 1 → Dm</span><span>Capo 2 → C#m</span><span>Capo 3 → Cm</span></div>
+      <div class="capo-line"><b>D# minor</b><span>Capo 1 → Dm</span><span>Capo 2 → C#m</span><span>Capo 3 → Cm</span></div>
       <div class="capo-line"><b>E minor</b><span>Capo 2 → Dm</span><span>Capo 3 → C#m</span><span>Capo 4 → Cm</span></div>
       <div class="capo-line"><b>F minor</b><span>Capo 1 → Em</span><span>Capo 3 → Dm</span><span>Capo 4 → C#m</span><span>Capo 5 → Cm</span></div>
       <div class="capo-line"><b>F# minor</b><span>Capo 1 → Fm</span><span>Capo 2 → Em</span><span>Capo 4 → Dm</span><span>Capo 5 → C#m</span></div>
       <div class="capo-line"><b>G minor</b><span>Capo 1 → F#m</span><span>Capo 2 → Fm</span><span>Capo 3 → Em</span><span>Capo 5 → Dm</span></div>
-      <div class="capo-line"><b>Ab minor</b><span>Capo 1 → Gm</span><span>Capo 2 → F#m</span><span>Capo 3 → Fm</span><span>Capo 4 → Em</span></div>
+      <div class="capo-line"><b>G# minor</b><span>Capo 1 → Gm</span><span>Capo 2 → F#m</span><span>Capo 3 → Fm</span><span>Capo 4 → Em</span></div>
       <div class="capo-line"><b>A minor</b><span>Capo 2 → Gm</span><span>Capo 3 → F#m</span><span>Capo 4 → Fm</span><span>Capo 5 → Em</span></div>
       <div class="capo-line"><b>Bb minor</b><span>Capo 1 → Am</span><span>Capo 3 → Gm</span><span>Capo 4 → F#m</span><span>Capo 5 → Fm</span></div>
       <div class="capo-line"><b>B minor</b><span>Capo 2 → Am</span><span>Capo 4 → Gm</span><span>Capo 5 → F#m</span></div>
