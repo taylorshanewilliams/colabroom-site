@@ -33,6 +33,7 @@
     <a class="brand" href="index.html">CoLabRoom</a>
     <nav class="pages">
       <a href="chords.html">Chords</a>
+      <a href="what-key.html">What key</a>
       <a href="takes.html">Takes</a>
       <a href="analysis.html" aria-current="page">What it heard</a>
       <a href="songbook.html">Song sheet</a>
@@ -72,7 +73,12 @@
       <div class="stat"><div class="k">Tempo</div><div class="v">118 BPM</div></div>
       <div class="stat"><div class="k">Time</div><div class="v">4/4</div></div>
       <div class="stat"><div class="k">Bars</div><div class="v">96</div></div>
-      <div class="stat"><div class="k">Chords</div><div class="v">92%</div></div>
+      <!-- This tile read "Chords 92%". No benchmark supports that figure —
+           the only scorecard that exists was measured on clips rendered
+           from a soundfont, and it is not on this domain yet. So the tile
+           shows the thing itself, which is what somebody came for anyway.
+           No accuracy number appears anywhere on this site. -->
+      <div class="stat"><div class="k">Chords</div><div class="v">D A Bm G</div></div>
       <div class="stat"><div class="k">Stems</div><div class="v">6</div></div>
     </div>
   </section>
@@ -128,7 +134,7 @@
     <h2>Bring a song.</h2>
     <p>The beta is small and free, and I read everything that comes back.</p>
     <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta">Email for an invite</a>
-    <div class="meta">Free during the beta · iPhone and Android</div>
+    <div class="meta">Free during the beta · works in your browser</div>
   </div>
 
   <nav class="keep-reading" aria-label="More about CoLabRoom">
@@ -160,6 +166,7 @@
 
 </div>
 
+<script src="count.js" data-page="analysis"></script>
 <script src="stage.js"></script>
 <script src="reveal.js"></script>
 </body>

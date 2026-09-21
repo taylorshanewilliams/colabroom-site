@@ -33,6 +33,7 @@
     <a class="brand" href="index.html">CoLabRoom</a>
     <nav class="pages">
       <a href="chords.html" aria-current="page">Chords</a>
+      <a href="what-key.html">What key</a>
       <a href="takes.html">Takes</a>
       <a href="analysis.html">What it heard</a>
       <a href="songbook.html">Song sheet</a>
@@ -86,8 +87,13 @@
         The app has no daily limit — and it keeps the chords with the song,
         puts them over the words, and lets other people play on it.
       </p>
+      <!-- This was a mailto, which is why the arrival code has never once
+           reached a sign-up: count.js appends ?from=<code> to app links and
+           structurally cannot do it to a mail draft. It also asked the most
+           interested visitor this page ever gets to open an email client and
+           wait for a reply. Sign-up has been open all along. -->
       <div class="gate-actions">
-        <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta&amp;body=I%20used%20the%20chord%20tool%20and%20would%20like%20the%20app.">Get the app</a>
+        <a class="cta" href="https://app.colabroom.com/">Open the app</a>
         <button type="button" class="cta quiet" id="gate-back">Back to the tool</button>
       </div>
     </div>
@@ -160,6 +166,7 @@
 
 </div>
 
+<script src="count.js" data-page="chords"></script>
 <script src="chords.js"></script>
 <script src="reveal.js"></script>
 </body>
