@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>What chords is this? — CoLabRoom</title>
+<title>What chords is this? Chords from your recording — CoLabRoom</title>
 <meta name="description" content="Drop in a recording and get the chords back. No account, nothing to install, and your audio is never stored.">
 <meta property="og:title" content="What chords is this?">
 <meta property="og:description" content="Drop in a recording and get the chords back. No account. Your audio is never stored.">
 <meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="site.css">
   <link rel="canonical" href="https://colabroom.com/chords.html">
   <meta property="og:url" content="https://colabroom.com/chords.html">
@@ -24,6 +24,71 @@
   <meta name="twitter:description" content="Drop in a recording and get the chords back. No account. Your audio is never stored.">
   <meta name="twitter:image" content="https://colabroom.com/share.png">
   <meta name="theme-color" content="#06101F">
+<!-- Only what the page itself says. No rating, no count, no figure for
+     how well it does or how long it takes — the one number this domain
+     is ever allowed to print lives on the benchmark page, and that page
+     does not exist yet. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "HowTo",
+      "name": "How to find the chords in a recording",
+      "description": "Put a recording into the free tool and get the chords back, with the key it landed on.",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Put the recording in",
+          "text": "Drop a song onto the page, or choose a file. mp3, wav or m4a, up to 24MB.",
+          "url": "https://colabroom.com/chords.html#tool"
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Let it listen",
+          "text": "It plays the recording through and works out the harmony. The page says what it is doing while it goes.",
+          "url": "https://colabroom.com/chords.html#tool"
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Read the chords",
+          "text": "The key it estimated comes back with the progression and every chord change in order. Copy them as text, or copy a link that carries the whole chart inside it.",
+          "url": "https://colabroom.com/chords.html#tool"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Do I need an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. It is free, there is no account, and there is nothing to install."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens to my recording?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We never keep your recording."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What files can I use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "mp3, wav or m4a, up to 24MB."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -33,6 +98,7 @@
     <a class="brand" href="index.html">CoLabRoom</a>
     <nav class="pages">
       <a href="chords.html" aria-current="page">Chords</a>
+      <a href="what-key.html">What key</a>
       <a href="takes.html">Takes</a>
       <a href="analysis.html">What it heard</a>
       <a href="songbook.html">Song sheet</a>
@@ -86,8 +152,13 @@
         The app has no daily limit — and it keeps the chords with the song,
         puts them over the words, and lets other people play on it.
       </p>
+      <!-- This was a mailto, which is why the arrival code has never once
+           reached a sign-up: count.js appends ?from=<code> to app links and
+           structurally cannot do it to a mail draft. It also asked the most
+           interested visitor this page ever gets to open an email client and
+           wait for a reply. Sign-up has been open all along. -->
       <div class="gate-actions">
-        <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta&amp;body=I%20used%20the%20chord%20tool%20and%20would%20like%20the%20app.">Get the app</a>
+        <a class="cta" href="https://app.colabroom.com/">Open the app</a>
         <button type="button" class="cta quiet" id="gate-back">Back to the tool</button>
       </div>
     </div>
@@ -160,6 +231,7 @@
 
 </div>
 
+<script src="count.js" data-page="chords"></script>
 <script src="chords.js"></script>
 <script src="reveal.js"></script>
 </body>

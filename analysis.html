@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>What it heard — CoLabRoom</title>
+<title>Key, tempo, chords and words from one recording — CoLabRoom</title>
 <meta name="description" content="Play a song once into your phone and get back a song sheet: the key, the tempo, the chords in bars, the song's shape, the words you sang, and every instrument separated out.">
 <meta property="og:title" content="What it heard — CoLabRoom">
 <meta property="og:description" content="It listens back and writes it down.">
 <meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="site.css">
   <link rel="canonical" href="https://colabroom.com/analysis.html">
   <meta property="og:url" content="https://colabroom.com/analysis.html">
@@ -24,6 +24,16 @@
   <meta name="twitter:description" content="It listens back and writes it down.">
   <meta name="twitter:image" content="https://colabroom.com/share.png">
   <meta name="theme-color" content="#06101F">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "CoLabRoom", "item": "https://colabroom.com/" },
+    { "@type": "ListItem", "position": 2, "name": "What it heard", "item": "https://colabroom.com/analysis.html" }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -33,6 +43,7 @@
     <a class="brand" href="index.html">CoLabRoom</a>
     <nav class="pages">
       <a href="chords.html">Chords</a>
+      <a href="what-key.html">What key</a>
       <a href="takes.html">Takes</a>
       <a href="analysis.html" aria-current="page">What it heard</a>
       <a href="songbook.html">Song sheet</a>
@@ -72,7 +83,12 @@
       <div class="stat"><div class="k">Tempo</div><div class="v">118 BPM</div></div>
       <div class="stat"><div class="k">Time</div><div class="v">4/4</div></div>
       <div class="stat"><div class="k">Bars</div><div class="v">96</div></div>
-      <div class="stat"><div class="k">Chords</div><div class="v">92%</div></div>
+      <!-- This tile read "Chords 92%". No benchmark supports that figure —
+           the only scorecard that exists was measured on clips rendered
+           from a soundfont, and it is not on this domain yet. So the tile
+           shows the thing itself, which is what somebody came for anyway.
+           No accuracy number appears anywhere on this site. -->
+      <div class="stat"><div class="k">Chords</div><div class="v">D A Bm G</div></div>
       <div class="stat"><div class="k">Stems</div><div class="v">6</div></div>
     </div>
   </section>
@@ -128,7 +144,7 @@
     <h2>Bring a song.</h2>
     <p>The beta is small and free, and I read everything that comes back.</p>
     <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta">Email for an invite</a>
-    <div class="meta">Free during the beta · iPhone and Android</div>
+    <div class="meta">Free during the beta · works in your browser</div>
   </div>
 
   <nav class="keep-reading" aria-label="More about CoLabRoom">
@@ -160,6 +176,7 @@
 
 </div>
 
+<script src="count.js" data-page="analysis"></script>
 <script src="stage.js"></script>
 <script src="reveal.js"></script>
 </body>

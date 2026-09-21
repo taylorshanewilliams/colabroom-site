@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Stuck? — CoLabRoom</title>
+<title>Stuck on a chord? What fits with it — CoLabRoom</title>
 <meta name="description" content="Tap any chord in your own song and find out what else fits, what a lead can play over it, and what a harmony would sing. Answered for your song, in your key, on your instrument.">
 <meta property="og:title" content="Stuck? — CoLabRoom">
 <meta property="og:description" content="Tap the chord you're stuck on.">
 <meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="site.css">
   <link rel="canonical" href="https://colabroom.com/help.html">
   <meta property="og:url" content="https://colabroom.com/help.html">
@@ -24,6 +24,16 @@
   <meta name="twitter:description" content="Tap the chord you're stuck on.">
   <meta name="twitter:image" content="https://colabroom.com/share.png">
   <meta name="theme-color" content="#06101F">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "CoLabRoom", "item": "https://colabroom.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Stuck?", "item": "https://colabroom.com/help.html" }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -33,6 +43,7 @@
     <a class="brand" href="index.html">CoLabRoom</a>
     <nav class="pages">
       <a href="chords.html">Chords</a>
+      <a href="what-key.html">What key</a>
       <a href="takes.html">Takes</a>
       <a href="analysis.html">What it heard</a>
       <a href="songbook.html">Song sheet</a>
@@ -151,6 +162,7 @@
 
 </div>
 
+<script src="count.js" data-page="help"></script>
 <script src="stage.js"></script>
 <script src="reveal.js"></script>
 </body>

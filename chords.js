@@ -35,61 +35,25 @@ let arrivedShared = false;
 /* ------------------------------------------------------------------
    Where people stop.
 
-   The tool has been live for days and the database holds one requester
-   and three analyses, all of them ours on the day it shipped. So the
-   question this answers is not "which step loses people" yet — it is
-   the plainer one of whether anybody arrives at all, which right now
-   nothing on this site can answer.
+   `note`, the arrival code and the link onward to the app moved to
+   count.js, which every page loads — this file is on two of them, and
+   the front door was recording nothing and dropping the flier code. The
+   steps left here are the ones that are about this tool: chose_file,
+   analyzed_ok, analyzed_fail, limit_reached, copied_text, shared_link,
+   opened_shared, made_own and clicked_onward. count.js sends `opened`
+   and `clicked_app` for every page including this one.
 
-   Every step is recorded from here rather than some from the server,
-   because a funnel whose steps are measured by different mechanisms
-   cannot be compared across steps, and comparing across steps is the
-   entire purpose of a funnel.
+   Every step is still recorded from the page rather than some from the
+   server, because a funnel whose steps are measured by different
+   mechanisms cannot be compared across steps, and comparing across
+   steps is the entire purpose of a funnel. The shape of the beacon —
+   a GET, with keepalive — is explained in count.js, which sends it.
 
-   `keepalive` matters on the ones that precede a navigation: without
-   it, following a link cancels the request that was recording that the
-   link was followed.
-
-   **A GET, deliberately, for a call that changes a number.** The live
-   function treats every POST as an audio upload and claims a slot from
-   the daily quota *before* it looks at the body — so a POST beacon
-   shipped a moment before the function is redeployed would spend one of
-   a visitor's five free songs on loading the page. It refuses anything
-   that is not a POST first, without touching the quota, which makes GET
-   the one shape that is harmless against both the old deployment and
-   the new one. Correctness under a version skew beats REST here.
+   The fallback is a no-op rather than an error: if count.js ever fails
+   to load, the tool still works and only the counting is missing, which
+   is the right way round.
    ------------------------------------------------------------------ */
-/* Where this visitor came from.
-
-   A flier on a board, a card on a merch table, a link under a video:
-   each carries ?c=<code>. The page keeps the code for the visit and
-   for next time, every step below carries it, and the link onward to
-   the app carries it as ?from=, so an account made there can say which
-   board it came from. The code names a place, never a person. */
-const CODE = (() => {
-  try {
-    const raw = new URL(location.href).searchParams.get('c');
-    if (raw && /^[a-z0-9-]{1,32}$/i.test(raw)) {
-      localStorage.setItem('colabroom_code', raw.toLowerCase());
-      return raw.toLowerCase();
-    }
-    return localStorage.getItem('colabroom_code') || '';
-  } catch (_) {
-    return '';
-  }
-})();
-
-function note(step) {
-  try {
-    fetch(ENDPOINT + '/note?step=' + encodeURIComponent(step)
-        + (CODE ? '&c=' + encodeURIComponent(CODE) : ''), {
-      cache: 'no-store',
-      keepalive: true,
-    }).catch(() => {});
-  } catch (_) {
-    /* Measurement never breaks the page it measures. */
-  }
-}
+const note = (window.CoLab && window.CoLab.note) || function () {};
 const gateBack = document.getElementById('gate-back');
 
 /* Harte notation into what a musician writes.
@@ -475,25 +439,12 @@ shareBtn.addEventListener('click', async () => {
   }
 })();
 
-/* The page was opened, and the two ways somebody leaves it towards the
-   product. `clicked_app` and `clicked_onward` are separate because they
-   are different levels of interest: one is "show me more about this",
-   the other is "I want the thing". */
-note('opened');
-
+/* One of the cards under the result was followed. `clicked_app` is the
+   other way somebody leaves this page and it is counted in count.js,
+   because every page has a way towards the app and only these two have
+   the cards. They are separate steps because they are different levels
+   of interest: one is "show me more about this", the other is "I want
+   the thing". */
 for (const link of document.querySelectorAll('.onward')) {
   link.addEventListener('click', () => note('clicked_onward'));
-}
-for (const link of document.querySelectorAll('a[href*="app.colabroom.com"], a[href^="mailto:beta@"]')) {
-  link.addEventListener('click', () => note('clicked_app'));
-  // The code rides on to the app, where an account claims it.
-  if (CODE && link.href.includes('app.colabroom.com')) {
-    try {
-      const onward = new URL(link.href);
-      onward.searchParams.set('from', CODE);
-      link.href = onward.toString();
-    } catch (_) {
-      /* A link that cannot be rewritten still works as it was. */
-    }
-  }
 }

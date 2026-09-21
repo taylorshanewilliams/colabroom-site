@@ -108,6 +108,7 @@ HEAD = """<!DOCTYPE html>
 <meta name="twitter:description" content="{description}">
 <meta name="twitter:image" content="{origin}/share.png">
 <meta name="theme-color" content="#06101F">
+<link rel="stylesheet" href="{origin}/fonts.css">
 <link rel="stylesheet" href="{origin}/site.css">
 <script type="application/ld+json">{schema}</script>
 </head>
@@ -117,6 +118,7 @@ HEAD = """<!DOCTYPE html>
     <a class="brand" href="{origin}/">CoLabRoom</a>
     <nav class="pages">
       <a href="{origin}/chords.html">Chords</a>
+      <a href="{origin}/what-key.html">What key</a>
       <a href="{origin}/openmic.html">Open Mic</a>
     </nav>
     <span class="sp"></span>
@@ -347,9 +349,14 @@ def main():
 
     # The generated half of the sitemap, kept separate from the hand-written
     # one so a bad run can never take the ten real pages down with it.
-    rows = '\n'.join(
-        '  <url><loc>%s</loc><changefreq>weekly</changefreq>'
-        '<priority>0.6</priority></url>' % u for u in sorted(urls))
+    # No changefreq and no priority: both are ignored by every search engine
+    # and both were saying something we do not know. lastmod is the field
+    # that is read, and it wants the date the page's *content* last changed
+    # — not the date this job last ran, which is every night whether
+    # anything changed or not. Emitting the build date here would be a
+    # nightly lie, so nothing is emitted until the row's updated_at is
+    # threaded through to this point.
+    rows = '\n'.join('  <url><loc>%s</loc></url>' % u for u in sorted(urls))
     with open(os.path.join(site, 'sitemap-pages.xml'), 'w',
               encoding='utf-8', newline='') as handle:
         handle.write(

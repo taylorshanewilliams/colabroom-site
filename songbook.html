@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The song sheet — CoLabRoom</title>
+<title>Chords over the words, on one printable page — CoLabRoom</title>
 <meta name="description" content="One page you type a song into. Everyone's colour beside the lines they wrote, voice notes on any line, chords above the words — and every chord tells you how to play it.">
 <meta property="og:title" content="The song sheet — CoLabRoom">
 <meta property="og:description" content="A page, not a form. Where the words and the chords live.">
 <meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="site.css">
   <link rel="canonical" href="https://colabroom.com/songbook.html">
   <meta property="og:url" content="https://colabroom.com/songbook.html">
@@ -24,6 +24,16 @@
   <meta name="twitter:description" content="A page, not a form. Where the words and the chords live.">
   <meta name="twitter:image" content="https://colabroom.com/share.png">
   <meta name="theme-color" content="#06101F">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "CoLabRoom", "item": "https://colabroom.com/" },
+    { "@type": "ListItem", "position": 2, "name": "The song sheet", "item": "https://colabroom.com/songbook.html" }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -33,6 +43,7 @@
     <a class="brand" href="index.html">CoLabRoom</a>
     <nav class="pages">
       <a href="chords.html">Chords</a>
+      <a href="what-key.html">What key</a>
       <a href="takes.html">Takes</a>
       <a href="analysis.html">What it heard</a>
       <a href="songbook.html" aria-current="page">Song sheet</a>
@@ -152,7 +163,7 @@
     <h2>Bring a song.</h2>
     <p>The beta is small and free, and I read everything that comes back.</p>
     <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta">Email for an invite</a>
-    <div class="meta">Free during the beta · iPhone and Android</div>
+    <div class="meta">Free during the beta · works in your browser</div>
   </div>
 
   <nav class="keep-reading" aria-label="More about CoLabRoom">
@@ -184,6 +195,7 @@
 
 </div>
 
+<script src="count.js" data-page="songbook"></script>
 <script src="stage.js"></script>
 <script src="reveal.js"></script>
 </body>

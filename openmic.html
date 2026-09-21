@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Open Mic — CoLabRoom</title>
+<title>Put a song up and say what it needs — CoLabRoom</title>
 <meta name="description" content="Find a musician, or be found by one. Nothing is public until you say so, nobody is ranked, and the fastest way through is hearing somebody play.">
 <meta property="og:title" content="The Open Mic — CoLabRoom">
 <meta property="og:description" content="Meet somebody you have not met. Songwriting for musicians who aren't in the same room.">
 <meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="site.css">
   <link rel="canonical" href="https://colabroom.com/openmic.html">
   <meta property="og:url" content="https://colabroom.com/openmic.html">
@@ -24,6 +24,16 @@
   <meta name="twitter:description" content="Meet somebody you have not met. Songwriting for musicians who aren't in the same room.">
   <meta name="twitter:image" content="https://colabroom.com/share.png">
   <meta name="theme-color" content="#06101F">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "CoLabRoom", "item": "https://colabroom.com/" },
+    { "@type": "ListItem", "position": 2, "name": "The Open Mic", "item": "https://colabroom.com/openmic.html" }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -33,6 +43,7 @@
     <a class="brand" href="index.html">CoLabRoom</a>
     <nav class="pages">
       <a href="chords.html">Chords</a>
+      <a href="what-key.html">What key</a>
       <a href="takes.html">Takes</a>
       <a href="analysis.html">What it heard</a>
       <a href="songbook.html">Song sheet</a>
@@ -118,7 +129,7 @@
     <h2>Bring a song.</h2>
     <p>The beta is small and free, and I read everything that comes back.</p>
     <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta">Email for an invite</a>
-    <div class="meta">Free during the beta · iPhone and Android</div>
+    <div class="meta">Free during the beta · works in your browser</div>
   </div>
 
   <nav class="keep-reading" aria-label="More about CoLabRoom">
@@ -150,6 +161,7 @@
 
 </div>
 
+<script src="count.js" data-page="openmic"></script>
 <script src="stage.js"></script>
 <script src="reveal.js"></script>
 </body>

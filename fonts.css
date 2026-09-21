@@ -1,0 +1,97 @@
+/* The three faces the site is drawn in, served from here.
+
+   They used to come from fonts.googleapis.com: a render-blocking
+   stylesheet on a third-party origin, which then pointed at a second
+   third-party origin for the files themselves. Two DNS lookups and two
+   TLS handshakes stood between a phone on a venue car park's 4G and the
+   first word of the page, and every one of those requests told Google
+   who was reading. There are no third-party fonts or stylesheets on
+   colabroom.com now. It is not down to zero hosts — a page still calls
+   our own Supabase function for the counters and the tool, and the
+   noindex flier page still pulls a QR library from cdnjs — but nothing
+   a visitor does not need is on the critical path any more.
+
+   These are the same files Google serves, byte for byte, taken from the
+   same API on 20 September 2026. All three are under the SIL Open Font
+   License 1.1, which permits exactly this; the licence and the copyright
+   notice for each one sit beside the files in fonts/.
+
+   Only the latin and latin-ext subsets are here. Google's stylesheet
+   also offers vietnamese, greek and cyrillic, which an English-only site
+   can never use — the browser was already skipping them, and now they
+   are not on the domain at all.
+
+   The weight ranges are the union of what the pages ask for: Archivo
+   500-900, Newsreader 300-500, JetBrains Mono 500. Each family is one
+   variable file per subset, so a page that uses five Archivo weights
+   downloads one Archivo.
+
+   To refresh: fetch the css2 URLs below with a current browser's user
+   agent, save the latin and latin-ext woff2 files over the ones in
+   fonts/, and check the unicode-range lines still match.
+
+     https://fonts.googleapis.com/css2?family=Archivo:wght@500..900
+     https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300..500
+     https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500
+*/
+
+/* Archivo — headings, buttons, the brand. latin-ext first so the
+   narrower range below wins where the two overlap. */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 500 900;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(fonts/archivo-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 500 900;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(fonts/archivo-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Newsreader — the body serif. The optical-size axis is left alone, so
+   the hero paragraph and the small print are drawn at the size they are
+   read at. */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 300 500;
+  font-display: swap;
+  src: url(fonts/newsreader-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 300 500;
+  font-display: swap;
+  src: url(fonts/newsreader-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* JetBrains Mono — eyebrows, timestamps, chord grids. One weight, as
+   before: the few places that ask for bold mono are eleven-pixel labels
+   and the browser's own emboldening has been drawing them all along. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(fonts/jetbrains-mono-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(fonts/jetbrains-mono-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
