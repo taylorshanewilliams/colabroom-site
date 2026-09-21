@@ -36,21 +36,27 @@
 
      A flier on a board, a card on a merch table, a link under a video:
      each carries ?c=<code>. The page keeps the code for the visit and
-     for next time, every step below carries it, and the link onward to
-     the app carries it as ?from=, so an account made there can say which
-     board it came from. The code names a place, never a person. */
-  var code = (function () {
+     for next time, the steps below carry it, and the link onward to the
+     app carries it as ?from=, so an account made there can say which
+     board it came from. The code names a place, never a person.
+
+     `fresh` says the code was on the address bar of *this* load — the
+     moment somebody actually walked through that door. A code read back
+     out of storage is the same person still reading, which is a
+     different thing and must not be counted as another arrival. */
+  var arrival = (function () {
     try {
       var raw = new URL(location.href).searchParams.get('c');
       if (raw && /^[a-z0-9-]{1,32}$/i.test(raw)) {
         localStorage.setItem('colabroom_code', raw.toLowerCase());
-        return raw.toLowerCase();
+        return { code: raw.toLowerCase(), fresh: true };
       }
-      return localStorage.getItem('colabroom_code') || '';
+      return { code: localStorage.getItem('colabroom_code') || '', fresh: false };
     } catch (_) {
-      return '';
+      return { code: '', fresh: false };
     }
   })();
+  var code = arrival.code;
 
   /* Add one to a daily counter.
 
@@ -73,10 +79,10 @@
      until the endpoint reads `page`, `opened` is the sum of every page
      that loads this file. Sending it now means the day the endpoint
      learns to read it, nothing here has to be republished. */
-  function note(step) {
+  function send(step, stepCode) {
     try {
       fetch(ENDPOINT + '/note?step=' + encodeURIComponent(step)
-          + (code ? '&c=' + encodeURIComponent(code) : '')
+          + (stepCode ? '&c=' + encodeURIComponent(stepCode) : '')
           + (page ? '&page=' + encodeURIComponent(page) : ''), {
         cache: 'no-store',
         keepalive: true,
@@ -86,7 +92,24 @@
     }
   }
 
-  note('opened');
+  /* The ordinary shape, used by everything that happens after the page
+     is up: the code it was found on rides along. */
+  function note(step) { send(step, code); }
+
+  /* The page loaded. Counted on every page, every time.
+
+     The code only rides on this one when it was on the address bar of
+     this load, because a step carrying a code is written to `arrivals`
+     and `arrival_report` adds those up. Attaching a remembered code here
+     would mean one person who scans a flier and then reads six pages
+     records six arrivals for that board, and more on every return visit
+     for as long as their browser keeps the code — so a board whose
+     visitors browse would beat a board whose visitors sign up. The
+     report exists to compare boards; this is the line that keeps it
+     able to. `clicked_app` and the tool's `analyzed_ok` still carry the
+     remembered code, because those are things the visitor did, not
+     pages they loaded. */
+  send('opened', arrival.fresh ? code : '');
 
   /* Somebody went from a page towards the app. The same selector the
      tool used, so the tool pages count exactly what they counted before

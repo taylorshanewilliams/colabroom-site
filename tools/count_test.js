@@ -114,16 +114,46 @@ Deno.test('every link towards the app counts as clicked_app', () => {
   assertStringIncludes(sent[2], 'step=clicked_app');
 });
 
-Deno.test('a code remembered from a previous visit is still used', () => {
+Deno.test('a remembered code carries on, but the page load is not a second arrival', () => {
   const { sent, nodes } = run({
     href: HOME + 'takes.html',
     stored: 'yt-chords-01',
     page: 'takes',
     links: [APP],
   });
-  assertStringIncludes(sent[0], 'c=yt-chords-01');
+
+  /* A step that carries a code is written to `arrivals`, and
+     `arrival_report` sums those. So the second, third and sixth page
+     this person reads must not each look like somebody new walking in
+     off that video — or a board whose visitors browse beats a board
+     whose visitors sign up. */
+  assertStringIncludes(sent[0], 'step=opened');
   assertStringIncludes(sent[0], 'page=takes');
-  assertEquals(nodes[0].href, APP + '?from=yt-chords-01');
+  assertFalse(sent[0].includes('c=yt-chords-01'),
+    'a code read back out of storage is the same person still reading, '
+    + 'not another arrival');
+
+  /* Everything the visitor actually does still says where they came
+     from, which is the half that makes the code worth keeping. */
+  assertEquals(nodes[0].href, APP + '?from=yt-chords-01',
+    'the link into the app still carries it');
+  nodes[0].click();
+  assertStringIncludes(sent[1], 'step=clicked_app');
+  assertStringIncludes(sent[1], 'c=yt-chords-01',
+    'going to the app is a thing they did, and it counts for the board');
+});
+
+Deno.test('a code on this load is an arrival, and counts as one', () => {
+  const { sent, nodes } = run({
+    href: HOME + '?c=orl-alley',
+    page: 'home',
+    links: [APP],
+  });
+  assertStringIncludes(sent[0], 'step=opened');
+  assertStringIncludes(sent[0], 'c=orl-alley',
+    'the one load where somebody really did walk through that door');
+  nodes[0].click();
+  assertStringIncludes(sent[1], 'c=orl-alley');
 });
 
 Deno.test('no code means no code — nothing is invented', () => {

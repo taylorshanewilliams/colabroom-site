@@ -170,6 +170,10 @@ section.moment .more {
 .stat .v {
   font-family: var(--display); font-weight: 900; font-size: 1.7rem;
   color: var(--text); letter-spacing: -0.02em; line-height: 1.15;
+  /* "D A Bm G" is the first value in here with spaces in it, and a tile on
+     a narrow phone is about 135px wide. A progression that wraps after
+     "Bm" reads as two answers. The row itself still wraps. */
+  white-space: nowrap;
 }
 
 .lyric span.line { display: flex; align-items: center; gap: 0.75rem; padding: 0.3rem 0; }

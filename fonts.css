@@ -4,8 +4,12 @@
    stylesheet on a third-party origin, which then pointed at a second
    third-party origin for the files themselves. Two DNS lookups and two
    TLS handshakes stood between a phone on a venue car park's 4G and the
-   first word of the page — and colabroom.com tells everyone it has no
-   third parties on it, which was very nearly true and is now true.
+   first word of the page, and every one of those requests told Google
+   who was reading. There are no third-party fonts or stylesheets on
+   colabroom.com now. It is not down to zero hosts — a page still calls
+   our own Supabase function for the counters and the tool, and the
+   noindex flier page still pulls a QR library from cdnjs — but nothing
+   a visitor does not need is on the critical path any more.
 
    These are the same files Google serves, byte for byte, taken from the
    same API on 20 September 2026. All three are under the SIL Open Font
