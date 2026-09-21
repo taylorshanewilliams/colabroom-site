@@ -1,0 +1,5 @@
+# The repository is text, with two exceptions. Git's own detection has
+# handled share.png fine, but a font that gets line endings rewritten on
+# a checkout is a silent failure that looks like a CSS bug, so say it.
+*.woff2 binary
+*.png   binary

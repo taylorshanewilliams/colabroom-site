@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CoLabRoom</title>
+<title>Songwriting app for you and your band — CoLabRoom</title>
 <meta name="description" content="Record a riff. Somebody else sings over it from anywhere. CoLabRoom keeps the takes and the words in one place, then listens back and writes down what you played.">
 <meta property="og:title" content="CoLabRoom">
 <meta property="og:description" content="Play it. Pass it on. Songwriting for musicians who aren't in the same room.">
 <meta property="og:type" content="website">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="site.css">
   <link rel="canonical" href="https://colabroom.com/">
   <meta property="og:url" content="https://colabroom.com/">
@@ -24,6 +24,54 @@
   <meta name="twitter:description" content="Play it. Pass it on. Songwriting for musicians who aren't in the same room.">
   <meta name="twitter:image" content="https://colabroom.com/share.png">
   <meta name="theme-color" content="#06101F">
+<!-- What a machine reading this page is told.
+
+     Two things are deliberately absent and stay absent: aggregateRating
+     and interactionStatistic. Those are a star score and a headcount,
+     and the rule that keeps a number of people off the Open Mic keeps
+     one out of the head of this page too. It will be tempting the first
+     week something ranks. The answer stays no.
+
+     operatingSystem is "Web" because that is where you can use this
+     today. It does not say iOS or Android until there is a listing
+     somebody can actually open. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://colabroom.com/#organisation",
+      "name": "CoLabRoom",
+      "url": "https://colabroom.com/",
+      "description": "Songwriting for musicians who aren't in the same room."
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://colabroom.com/#app",
+      "name": "CoLabRoom",
+      "url": "https://app.colabroom.com/",
+      "applicationCategory": "MusicApplication",
+      "operatingSystem": "Web",
+      "description": "Record a riff and somebody else sings over it from anywhere. The takes and the words stay in one place, and it listens back and writes down the chords.",
+      "featureList": [
+        "Record takes over each other without overwriting anybody",
+        "Chords, key and tempo from a recording",
+        "Chords above the words, in your own key",
+        "A private room per band",
+        "Print a chord chart or export ChordPro"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "Free during the beta."
+      },
+      "publisher": { "@id": "https://colabroom.com/#organisation" }
+    }
+  ]
+}
+</script>
 </head>
 <body>
 

@@ -108,6 +108,7 @@ HEAD = """<!DOCTYPE html>
 <meta name="twitter:description" content="{description}">
 <meta name="twitter:image" content="{origin}/share.png">
 <meta name="theme-color" content="#06101F">
+<link rel="stylesheet" href="{origin}/fonts.css">
 <link rel="stylesheet" href="{origin}/site.css">
 <script type="application/ld+json">{schema}</script>
 </head>
