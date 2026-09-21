@@ -35,38 +35,24 @@ let arrivedShared = false;
 /* ------------------------------------------------------------------
    Where people stop.
 
-   The tool has been live for days and the database holds one requester
-   and three analyses, all of them ours on the day it shipped. So the
-   question this answers is not "which step loses people" yet — it is
-   the plainer one of whether anybody arrives at all, which right now
-   nothing on this site can answer.
+   `note`, the arrival code and the link onward to the app moved to
+   count.js, which every page loads — this file is on two of them, and
+   the front door was recording nothing and dropping the flier code. The
+   steps left here are the ones that are about this tool: chose_file,
+   analyzed_ok, analyzed_fail, limit_reached, copied_text, shared_link,
+   opened_shared, made_own and clicked_onward. count.js sends `opened`
+   and `clicked_app` for every page including this one.
 
-   Every step is recorded from here rather than some from the server,
-   because a funnel whose steps are measured by different mechanisms
-   cannot be compared across steps, and comparing across steps is the
-   entire purpose of a funnel.
-
-   `keepalive` matters on the ones that precede a navigation: without
-   it, following a link cancels the request that was recording that the
-   link was followed.
-
-   **A GET, deliberately, for a call that changes a number.** The live
-   function treats every POST as an audio upload and claims a slot from
-   the daily quota *before* it looks at the body — so a POST beacon
-   shipped a moment before the function is redeployed would spend one of
-   a visitor's five free songs on loading the page. It refuses anything
-   that is not a POST first, without touching the quota, which makes GET
-   the one shape that is harmless against both the old deployment and
-   the new one. Correctness under a version skew beats REST here.
-   ------------------------------------------------------------------ */
-/* `note`, the arrival code, and the link onward to the app now live in
-   count.js, which every page on the site loads — the front door used to
-   record nothing and drop the code entirely. The steps below are the
-   ones that are about this tool, so they stayed here.
+   Every step is still recorded from the page rather than some from the
+   server, because a funnel whose steps are measured by different
+   mechanisms cannot be compared across steps, and comparing across
+   steps is the entire purpose of a funnel. The shape of the beacon —
+   a GET, with keepalive — is explained in count.js, which sends it.
 
    The fallback is a no-op rather than an error: if count.js ever fails
    to load, the tool still works and only the counting is missing, which
-   is the right way round. */
+   is the right way round.
+   ------------------------------------------------------------------ */
 const note = (window.CoLab && window.CoLab.note) || function () {};
 const gateBack = document.getElementById('gate-back');
 
