@@ -228,7 +228,9 @@ function show(el, on) {
 /* `retry` is the file to send again when the failure was ours or the
    network's rather than the recording's. Choosing the same file in the
    picker does nothing in most browsers (no change event for an unchanged
-   value), so "try that again" needs a button that really does it. */
+   value), so "try that again" needs a button that really does it. It is
+   sent as a retry, which is not a second file chosen, and the button goes
+   quiet on the first tap so a double tap cannot spend two songs. */
 function fail(message, retry) {
   note('analyzed_fail');
   show(working, false);
@@ -239,10 +241,28 @@ function fail(message, retry) {
     again.type = 'button';
     again.className = 'cta quiet problem-again';
     again.textContent = 'Try again';
-    again.addEventListener('click', () => send(retry));
+    again.addEventListener('click', () => {
+      if (again.disabled) return;
+      again.disabled = true;
+      send(retry, { retrying: true });
+    });
     problem.append(again);
   }
   show(problem, true);
+}
+
+/* The number in the line under the heading, from the server's own.
+
+   The page is written with today's number in it, because the limit should
+   be said before anybody chooses a file. The real number is a database
+   row that can be raised for a launch day without touching this site
+   (public_tool_budget, app migration 0178), and every reply that has one
+   carries it, so the line is put right the first time the page hears it
+   and cannot disagree with the gate after that. */
+function sayTheLimit(dailyLimit) {
+  const el = document.getElementById('daily-limit');
+  if (!el || !Number.isInteger(dailyLimit) || dailyLimit <= 0) return;
+  el.textContent = String(dailyLimit);
 }
 
 /* When the free songs come back, in the visitor's own clock.
@@ -270,6 +290,7 @@ function whenTheyComeBack(resetAt) {
 function stopForToday(body) {
   const when = whenTheyComeBack(body.reset_at);
   const lead = gate.querySelector('.gate-lead');
+  sayTheLimit(body.daily_limit);
   if (body.budget_reached) {
     lead.textContent = 'The free tool is resting until ' + when
       + '. Your song is fine; try it again then.';
@@ -353,9 +374,13 @@ function render(data) {
   result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-async function send(file) {
+/* `retrying` is set only by Try again. The funnel's first step is a person
+   choosing a file, and the same file sent again after a cold start is not
+   another one: counting it would inflate the step by exactly the failures
+   it is compared against. */
+async function send(file, { retrying = false } = {}) {
   if (!file) return;
-  note('chose_file');
+  if (!retrying) note('chose_file');
   if (file.size > 24 * 1024 * 1024) {
     fail('That file is over 24MB. A normal song is well under it.');
     return;
@@ -407,6 +432,7 @@ async function send(file) {
       );
       return;
     }
+    sayTheLimit(body && body.daily_limit);
     render(body);
   } catch (error) {
     // Almost always the network rather than us. Said plainly, because "failed

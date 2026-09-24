@@ -51,9 +51,11 @@
     <p>Drop in a song. Get the chords back.</p>
     <!-- The limit is said before it bites, not only at the gate. 25 is
          public_tool_budget.per_requester_daily (app migration 0178); a
-         launch day that raises it should raise this with it. The gate
-         itself reads the number from the server's reply. -->
-    <div class="meta">Free · 25 songs a day · No account · We never keep your recording</div>
+         launch day that raises it should raise this with it. chords.js
+         rewrites #daily-limit from the first reply that carries the
+         server's number, and the gate reads it from the reply too, so the
+         page can only be wrong until it has heard from the server. -->
+    <div class="meta">Free · <span id="daily-limit">25</span> songs a day · No account · We never keep your recording</div>
   </div>
 
   <!-- First thing on the page, because somebody who arrived searching for

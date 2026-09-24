@@ -65,7 +65,7 @@ class Node {
 
 const IDS = ['drop', 'file', 'pick', 'working', 'working-note', 'problem',
   'result', 'key', 'prog', 'chart', 'copy', 'share', 'again', 'gate',
-  'shared-note', 'gate-back', 'tool'];
+  'shared-note', 'gate-back', 'tool', 'daily-limit'];
 
 /* A page with chords.js running on it.
 
@@ -79,6 +79,8 @@ function open({ hash = '', replies = [] } = {}) {
   const lead = new Node('p');
   lead.textContent = "That's all your free songs for today.";
   els.gate.found = { '.gate-lead': lead };
+  /* What the line under the heading is written with. */
+  els['daily-limit'].textContent = '25';
 
   const uploads = [];
   const steps = [];
@@ -228,6 +230,47 @@ Deno.test('Try again, when the server asks for it, resends the same file', async
   assertEquals(page.uploads[1].size, page.uploads[0].size);
   assertEquals(page.els.result.hidden, false);
   assertEquals(page.els.key.textContent, 'G major');
+  assertEquals(page.steps.filter((step) => step === 'chose_file').length, 1,
+    'one file was chosen; sending it again is not a second one');
+});
+
+Deno.test('a double tap on Try again sends the song once', async () => {
+  const page = open({ replies: [WAKING, CHORDS, CHORDS] });
+  page.choose(song());
+  await settle();
+
+  const again = tryAgainIn(page.els.problem);
+  again.click();
+  again.click();
+  await settle();
+
+  assertEquals(page.uploads.length, 2, 'one try, then one retry, never two');
+});
+
+Deno.test('the number under the heading follows the server once it has said one', async () => {
+  const raised = { ...CHORDS, body: { ...CHORDS.body, daily_limit: 60 } };
+  const page = open({ replies: [raised] });
+  assertEquals(page.els['daily-limit'].textContent, '25', 'what the page is written with');
+  page.choose(song());
+  await settle();
+  assertEquals(page.els['daily-limit'].textContent, '60');
+
+  /* The gate puts it right too, so the line above it cannot say another. */
+  const gated = open({
+    replies: [{ status: 429, body: { limit_reached: true, daily_limit: 40 } }],
+  });
+  gated.choose(song());
+  await settle();
+  assertEquals(gated.els['daily-limit'].textContent, '40');
+  assert(gated.lead.textContent.startsWith("That's your 40 songs for today."), gated.lead.textContent);
+
+  /* A reply with no number in it, or not a number, leaves the line alone. */
+  const older = open({ replies: [CHORDS, { status: 429, body: { limit_reached: true, daily_limit: '99' } }] });
+  older.choose(song('one.mp3'));
+  await settle();
+  older.choose(song('two.mp3'));
+  await settle();
+  assertEquals(older.els['daily-limit'].textContent, '25');
 });
 
 Deno.test('a connection that dropped offers Try again too, and a bad recording does not', async () => {
