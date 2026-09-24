@@ -48,8 +48,14 @@
 
   <div class="hero">
     <h1>What key<br>is this song?</h1>
-    <p>Drop in a recording. The key comes back with the chords that decided it.</p>
-    <div class="meta">Free · No account · We never keep your recording</div>
+    <p>Drop in a recording. The key comes back with the chords that decided it, and when two keys are close, both.</p>
+    <!-- The limit is said before it bites, not only at the gate. 25 is
+         public_tool_budget.per_requester_daily (app migration 0178); a
+         launch day that raises it should raise this with it. chords.js
+         rewrites #daily-limit from the first reply that carries the
+         server's number, and the gate reads it from the reply too, so the
+         page can only be wrong until it has heard from the server. -->
+    <div class="meta">Free · <span id="daily-limit">25</span> songs a day · No account · We never keep your recording</div>
   </div>
 
   <!-- First thing on the page, because somebody who arrived searching for
@@ -81,10 +87,14 @@
          is the moment to ask, and it is the only moment on this page that has
          earned the right to. -->
     <div class="gate" id="gate" hidden>
-      <p class="gate-lead">That is your free songs for today.</p>
+      <!-- chords.js writes this line from the reply: how many songs, and
+           when they come back in the visitor's own time, or that the whole
+           tool is resting for the day. This is only what shows if it
+           cannot. -->
+      <p class="gate-lead">That's all your free songs for today.</p>
       <p class="gate-sub">
-        The app has no daily limit — and it keeps the chords with the song,
-        puts them over the words, and lets other people play on it.
+        The app keeps the chords with the song, puts them over the words,
+        and lets other people play on it.
       </p>
       <div class="gate-actions">
         <a class="cta" href="mailto:beta@colabroom.com?subject=CoLabRoom%20beta&amp;body=I%20used%20the%20chord%20tool%20and%20would%20like%20the%20app.">Get the app</a>
@@ -132,14 +142,22 @@
 
   <section class="moment reveal">
     <div class="eyebrow">How it decides</div>
+    <!-- What key_from_chords.ts in the app repository does, and nothing it
+         does not: every chord weighed against all twenty-four keys for as
+         long as it sounds, a chord outside a key counted against it, and
+         the song's home read from the first chord, the last, the longest
+         and every cadence that lands. The app's own sheet uses the same
+         finder. -->
     <h2>The chords tell you the key.</h2>
     <p class="lede">
-      A key is the set of chords a song keeps coming home to. The tool listens
-      for the chords first, then asks which key holds most of them and which
-      one the song rests on. That is why the answer above says
-      <em>estimated</em>: it is the same judgement a player makes by ear, made
-      from the same evidence, and a song that borrows a chord from next door
-      can fool either of you for a bar.
+      A key is the set of chords a song keeps coming home to. The tool names
+      the chords first, then weighs the whole run of them against all
+      twenty-four keys: how well each chord belongs, for as long as it sounds,
+      and where the song comes home — the chord it starts on, the one it ends
+      on, the one it holds longest, and every cadence that lands. That is why
+      the answer above says <em>estimated</em>: it is the same judgement a
+      player makes by ear, made from the same evidence, and a song that
+      borrows a chord from next door can fool either of you for a bar.
     </p>
   </section>
 
@@ -150,7 +168,8 @@
       G major and E minor share every chord. What separates them is where the
       song feels finished. If the last chord of the chorus sounds like a door
       closing on G, it is in G; if it settles on Em and stays there, it is in
-      E minor. The tool reports the one the recording leans on. When it gets
+      E minor. The tool reports the one the recording leans on, and when it
+      leans on both it says so: <em>G major, or E minor</em>. When it gets
       the pair right and the home wrong, the chords are still right, and you
       will hear which of the two it is in about four bars.
     </p>

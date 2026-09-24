@@ -228,19 +228,32 @@
         documents are read on your own device.
       </p>
 
+      <!-- The same steps and words as the app's own answer to "How do I
+           delete my account?" (help_answers.dart, delete-account) and its
+           Before you go screen (app migration 0209). Until 24 September
+           2026 this said a room could not be passed on first, long after
+           the app had shipped handing one over (0196). -->
       <h3>To delete your account</h3>
       <ol>
         <li>Open CoLabRoom and go to the <strong>Account</strong> screen.</li>
-        <li>Choose <strong>Delete account</strong> and confirm.</li>
+        <li>Choose <strong>Delete account</strong>, at the bottom.</li>
+        <li>If other people are in a room of yours, it is listed first. Settle
+          each one: <strong>Hand it over</strong> to somebody in it, or
+          <strong>Close the room</strong>.</li>
+        <li>Confirm.</li>
       </ol>
       <p>
         This is immediate and permanent, with no undo and no recovery window.
-        It removes your profile, your lyric lines, comments and invitations —
-        and every room you own, including its songs and everything your
-        bandmates added to them. There is currently no way to hand a room to
-        someone else first, so if you own one your band is using, make sure
-        everyone has their own copy of anything they would want to keep before
-        you delete your account.
+        It removes your profile, your words, and every room nobody else is in,
+        with its songs.
+      </p>
+      <p>
+        <strong>Hand it over</strong> moves the room and every song in it to
+        somebody in it, once they say yes. <strong>Close the room</strong>
+        gives every song somebody else in it started, played on or wrote on to
+        them, in a room of their own, and deletes the rest. Songs you started
+        and takes you shared in other people's rooms stay with their bands,
+        without your name.
       </p>
       <p>
         If you cannot sign in and need your account removed, email
@@ -248,12 +261,16 @@
         the address you signed up with.
       </p>
 
+      <!-- The same story as privacy.html, "How long we keep it". Nothing
+           has been deleted by a clock since app PR #491 (23 September 2026):
+           the weekly job only clears files no take names any more. -->
       <h3>How long takes are kept</h3>
       <p>
-        Takes nobody has opened for 90 days are removed, so storage does not
-        grow forever. You are warned before it happens, opening a song resets
-        the clock, and everything can be exported from inside the app at any
-        time.
+        A take is never deleted because nobody has played it for a while. It
+        stays until somebody removes it: whoever recorded it, the room's
+        owner, or whoever deletes the song or the room it is on. In the app on
+        a phone, Save on a song's Takes gives you a copy of the takes you can
+        hear, whenever you want one.
       </p>
 
       <h3>It is early</h3>
@@ -304,5 +321,20 @@
 
 <script src="stage.js"></script>
 <script src="reveal.js"></script>
+<script>
+  /* The account-deletion steps are what the stores and the footer link to,
+     as #beta. Arriving there left them folded under a summary line to find
+     and tap; now the address opens them. */
+  (function () {
+    const legal = document.getElementById('beta');
+    if (!legal) return;
+    const openIfAsked = () => { if (location.hash === '#beta') legal.open = true; };
+    openIfAsked();
+    window.addEventListener('hashchange', openIfAsked);
+    for (const link of document.querySelectorAll('a[href="#beta"]')) {
+      link.addEventListener('click', () => { legal.open = true; });
+    }
+  })();
+</script>
 </body>
 </html>

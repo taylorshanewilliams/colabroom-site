@@ -85,13 +85,19 @@
 
     <div class="sheet" id="sheet">
       <div class="brand">CoLabRoom</div>
-      <div class="big">Play it.<br>Get the chords.</div>
-      <p class="sm">Record any song on your phone and the sheet comes back in a minute: the key, the chords, the words. Free. No account. Nothing stored.</p>
+      <div class="big">Got a recording?<br>Get the chords.</div>
+      <!-- Only what chords.html does: it takes a file (there is no recording
+           on the page), gives back the key and the chords (no lyrics), and
+           keeps no recording, which is narrower than keeping nothing at all
+           (privacy.html describes the salted address hash kept for about a
+           day). Fliers printed before 24 September 2026 promised all three
+           and want replacing wherever they are still up. -->
+      <p class="sm">Drop in a song and the chords come back: the key, the progression, every change in order. Free. No account. We never keep your recording.</p>
       <div class="qr">
         <div id="qr"></div>
         <ol class="steps">
           <li>Point your camera at the code.</li>
-          <li>Drop in a recording, or record one there.</li>
+          <li>Choose a recording on your phone.</li>
           <li>Read the chords. Keep them if you want.</li>
         </ol>
       </div>

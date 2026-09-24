@@ -225,12 +225,92 @@ function show(el, on) {
   el.hidden = !on;
 }
 
-function fail(message) {
+/* `retry` is the file to send again when the failure was ours or the
+   network's rather than the recording's. Choosing the same file in the
+   picker does nothing in most browsers (no change event for an unchanged
+   value), so "try that again" needs a button that really does it. It is
+   sent as a retry, which is not a second file chosen, and the button goes
+   quiet on the first tap so a double tap cannot spend two songs. */
+function fail(message, retry) {
   note('analyzed_fail');
   show(working, false);
   show(result, false);
   problem.textContent = message;
+  if (retry) {
+    const again = document.createElement('button');
+    again.type = 'button';
+    again.className = 'cta quiet problem-again';
+    again.textContent = 'Try again';
+    again.addEventListener('click', () => {
+      if (again.disabled) return;
+      again.disabled = true;
+      send(retry, { retrying: true });
+    });
+    problem.append(again);
+  }
   show(problem, true);
+}
+
+/* The number in the line under the heading, from the server's own.
+
+   The page is written with today's number in it, because the limit should
+   be said before anybody chooses a file. The real number is a database
+   row that can be raised for a launch day without touching this site
+   (public_tool_budget, app migration 0178), and every reply that has one
+   carries it, so the line is put right the first time the page hears it
+   and cannot disagree with the gate after that. */
+function sayTheLimit(dailyLimit) {
+  const el = document.getElementById('daily-limit');
+  if (!el || !Number.isInteger(dailyLimit) || dailyLimit <= 0) return;
+  el.textContent = String(dailyLimit);
+}
+
+/* When the free songs come back, in the visitor's own clock.
+
+   The server's day ends at midnight UTC, which is the evening before in
+   Florida and the next morning in Tokyo. "Midnight UTC" is arithmetic
+   a musician should not have to do, so the page says the local time the
+   server's `reset_at` falls on, and only says UTC when it has no instant
+   to go on. */
+function whenTheyComeBack(resetAt) {
+  const at = resetAt ? new Date(resetAt) : null;
+  if (!at || isNaN(at.getTime())) return 'midnight UTC';
+  /* Always within the next day, so a local midnight is the coming one and
+     needs no date beside it. */
+  if (at.getHours() === 0 && at.getMinutes() === 0) return 'midnight, your time';
+  const time = at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  return at.toDateString() === new Date().toDateString()
+    ? time + ' your time'
+    : time + ' tomorrow, your time';
+}
+
+/* The free tool's two ways of saying "not today", both drawn as the gate
+   rather than the problem box, because neither is a failure: one is this
+   visitor's share, the other is our budget for the whole day. */
+function stopForToday(body) {
+  const when = whenTheyComeBack(body.reset_at);
+  const lead = gate.querySelector('.gate-lead');
+  sayTheLimit(body.daily_limit);
+  if (body.budget_reached) {
+    lead.textContent = 'The free tool is resting until ' + when
+      + '. Your song is fine; try it again then.';
+  } else {
+    const limit = Number.isInteger(body.daily_limit) && body.daily_limit > 0
+      ? body.daily_limit
+      : null;
+    lead.textContent = (limit
+      ? "That's your " + limit + ' songs for today.'
+      : "That's all your free songs for today.")
+      + ' They come back at ' + when + '.';
+  }
+  show(working, false);
+  show(result, false);
+  show(problem, false);
+  show(gate, true);
+  /* The server counts budget_reached itself and says so with `counted`;
+     it does not count limit_reached. Counted once either way. */
+  if (!body.counted) note(body.budget_reached ? 'budget_reached' : 'limit_reached');
+  gate.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function render(data) {
@@ -240,7 +320,12 @@ function render(data) {
     return;
   }
 
-  keyEl.textContent = data.key || 'not sure';
+  /* When the finder came out close between two keys it says both, the
+     likelier first, rather than pretending to be sure of one. Relative
+     keys are the usual pair: G major, or E minor. */
+  keyEl.textContent = data.key
+    ? (data.key_runner_up ? data.key + ', or ' + data.key_runner_up : data.key)
+    : 'not sure';
 
   /* The progression: the first few distinct chords, which is what somebody
      asks for when they ask what a song is. Not every chord in the song —
@@ -277,7 +362,9 @@ function render(data) {
   lastCopyText = collapsed
     .map((c) => clock(c.start) + '  ' + c.name)
     .join('\n');
-  lastSheet = { k: data.key || '', c: collapsed.map(
+  /* `r` is the other key when there was one. A link made before it existed
+     has none, and opens as a key on its own, which is what it said then. */
+  lastSheet = { k: data.key || '', r: data.key_runner_up || '', c: collapsed.map(
     (c) => [c.name, Math.round(c.start * 10) / 10, Math.round(c.end * 10) / 10]) };
 
   show(working, false);
@@ -287,9 +374,13 @@ function render(data) {
   result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-async function send(file) {
+/* `retrying` is set only by Try again. The funnel's first step is a person
+   choosing a file, and the same file sent again after a cold start is not
+   another one: counting it would inflate the step by exactly the failures
+   it is compared against. */
+async function send(file, { retrying = false } = {}) {
   if (!file) return;
-  note('chose_file');
+  if (!retrying) note('chose_file');
   if (file.size > 24 * 1024 * 1024) {
     fail('That file is over 24MB. A normal song is well under it.');
     return;
@@ -327,34 +418,43 @@ async function send(file) {
       // has used their free songs has shown the only thing worth knowing
       // about them — they have music and they want to know what is in it —
       // and greeting that with a red error box is the wrong answer to the
-      // best moment this page gets.
-      if (body && body.limit_reached) {
-        show(working, false);
-        show(result, false);
-        show(problem, false);
-        show(gate, true);
-        note('limit_reached');
-        gate.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // best moment this page gets. A day whose budget is spent is not a
+      // failure either, and not theirs: until 24 September 2026 it fell
+      // through to the problem box and was counted as a failed analysis.
+      if (body && (body.limit_reached || body.budget_reached)) {
+        stopForToday(body);
         return;
       }
       fail(
         (body && body.error) ||
-          'That did not work. Try again in a moment.'
+          'That did not work. Try again in a moment.',
+        body && body.try_again ? file : null
       );
       return;
     }
+    sayTheLimit(body && body.daily_limit);
     render(body);
   } catch (error) {
     // Almost always the network rather than us. Said plainly, because "failed
-    // to fetch" is not a sentence anybody can act on.
-    fail('That upload did not reach us. Check your connection and try again.');
+    // to fetch" is not a sentence anybody can act on, and the same file is
+    // one tap from going again.
+    fail('That upload did not reach us. Check your connection and try again.', file);
   } finally {
     clearInterval(ticking);
   }
 }
 
 pick.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', () => send(fileInput.files[0]));
+/* The file is taken and the picker emptied at once. A picker still holding
+   a file fires no change event when the same one is chosen again, so after
+   "still waking up, try that again" choosing it again did nothing at all.
+   The File itself stays readable after the input is cleared, and send()
+   keeps it for the Try again button. */
+fileInput.addEventListener('change', () => {
+  const file = fileInput.files && fileInput.files[0];
+  fileInput.value = '';
+  send(file);
+});
 
 drop.addEventListener('submit', (event) => event.preventDefault());
 drop.addEventListener('click', (event) => {
@@ -467,6 +567,7 @@ shareBtn.addEventListener('click', async () => {
     // second renderer that would drift from this one.
     render({
       key: sheet.k,
+      key_runner_up: typeof sheet.r === 'string' ? sheet.r : '',
       chords: sheet.c.map(([name, start, end]) => ({ chord: name, start, end })),
     });
   } catch (_) {
