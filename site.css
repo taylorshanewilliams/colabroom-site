@@ -666,6 +666,10 @@ footer .sp { flex: 1; }
   color: var(--body);
   font-size: .9375rem;
 }
+/* The file that did not go is still in hand, so going again is one tap.
+   On a line of its own under the sentence, so it reads as the next step
+   rather than part of what went wrong. */
+.problem-again { display: block; margin-top: .85rem; cursor: pointer; }
 
 .result { margin-top: 1.75rem; }
 
