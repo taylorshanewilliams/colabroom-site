@@ -247,8 +247,8 @@ function fail(message, retry) {
 
 /* When the free songs come back, in the visitor's own clock.
 
-   The server's day ends at midnight UTC, which is eight in the evening in
-   Florida and nine the next morning in Tokyo. "Midnight UTC" is arithmetic
+   The server's day ends at midnight UTC, which is the evening before in
+   Florida and the next morning in Tokyo. "Midnight UTC" is arithmetic
    a musician should not have to do, so the page says the local time the
    server's `reset_at` falls on, and only says UTC when it has no instant
    to go on. */
@@ -394,7 +394,7 @@ async function send(file) {
       // about them — they have music and they want to know what is in it —
       // and greeting that with a red error box is the wrong answer to the
       // best moment this page gets. A day whose budget is spent is not a
-      // failure either, and not theirs: until 23 September 2026 it fell
+      // failure either, and not theirs: until 24 September 2026 it fell
       // through to the problem box and was counted as a failed analysis.
       if (body && (body.limit_reached || body.budget_reached)) {
         stopForToday(body);
