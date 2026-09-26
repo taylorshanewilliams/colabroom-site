@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transpose chords online — any key, any capo — CoLabRoom</title>
+<meta name="description" content="Paste a chord chart, pick a key or a capo, and get it back with the words where they were. Free, no account, and the chart never leaves your browser.">
+<meta property="og:title" content="Move it to where you sing.">
+<meta property="og:description" content="Paste a chord chart, pick a key or a capo, get it back. No account. The chart never leaves your browser.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Newsreader:opsz,wght@6..72,300;6..72,400&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="site.css">
+  <link rel="canonical" href="https://colabroom.com/transpose.html">
+  <meta property="og:url" content="https://colabroom.com/transpose.html">
+  <meta property="og:site_name" content="CoLabRoom">
+  <meta property="og:image" content="https://colabroom.com/share.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="CoLabRoom — songwriting for musicians who aren't in the same room.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Transpose chords online — any key, any capo — CoLabRoom">
+  <meta name="twitter:description" content="Paste a chord chart, pick a key or a capo, get it back. No account. The chart never leaves your browser.">
+  <meta name="twitter:image" content="https://colabroom.com/share.png">
+  <meta name="theme-color" content="#06101F">
+
+<!-- The free tools share a block of styles. It lives in each page rather than
+     in site.css so this change touches no file anything else is editing; it
+     folds into site.css the first time all three are in the navigation. -->
+<style>
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: .85rem 1.25rem;
+  align-items: flex-end; margin: 1.25rem 0;
+}
+.field { display: flex; flex-direction: column; gap: .35rem; }
+.field span, .seg legend {
+  font-family: var(--mono); font-size: .625rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--muted); padding: 0;
+}
+.field select, .chartbox, .step button, .seg span {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: .6rem; color: var(--text);
+}
+.field select {
+  font-family: var(--display); font-size: 1rem; font-weight: 700;
+  padding: .55rem .7rem; min-height: 2.9rem; min-width: 8.5rem;
+}
+.step { display: flex; gap: .4rem; }
+.step button {
+  font-family: var(--display); font-weight: 800; font-size: 1.15rem;
+  min-width: 2.9rem; min-height: 2.9rem; cursor: pointer;
+}
+.step button:hover { border-color: var(--cyan); }
+select:focus-visible, button:focus-visible, textarea:focus-visible,
+.seg input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* The browser's own rule for [hidden] is display: none, and any author rule
+   that sets display beats it — .seg below sets flex. Without this line a row
+   with the attribute on it stays on screen. */
+[hidden] { display: none !important; }
+
+/* Radios underneath, so a keyboard gets a radio group and a screen reader
+   gets a named set rather than a row of buttons that say nothing. */
+.seg { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35rem; }
+.seg .choices { display: flex; flex-wrap: wrap; gap: .4rem; }
+.seg label { display: inline-flex; }
+.seg input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.seg span {
+  font-family: var(--display); font-weight: 700; font-size: .9rem;
+  padding: .6rem 1rem; min-height: 2.9rem; display: inline-flex; align-items: center;
+  border-radius: 100px; color: var(--muted); cursor: pointer;
+}
+.seg input:checked + span { color: var(--text); border-color: var(--cyan); background: #0C1D33; }
+.tool .seg { margin-bottom: 1rem; }
+
+.chartbox {
+  width: 100%; min-height: 10rem; resize: vertical; display: block;
+  font-family: var(--mono); font-size: .8125rem; line-height: 1.75;
+  padding: 1rem; white-space: pre; overflow-x: auto; tab-size: 8;
+}
+/* iOS Safari zooms the whole page whenever an input under 16px takes focus,
+   and with wrap="off" the zoomed page then pans sideways — on the one control
+   a thumb goes to first. */
+@media (pointer: coarse) { .chartbox { font-size: 1rem; } }
+.answer {
+  font-family: var(--display); font-size: clamp(1.25rem, 4.5vw, 1.7rem);
+  font-weight: 800; color: var(--text); margin: 0;
+}
+.answer-detail {
+  font-family: var(--display); font-size: clamp(1.1rem, 4vw, 1.4rem);
+  font-weight: 700; color: var(--gold); letter-spacing: .05em; margin: .4rem 0 0;
+}
+.quiet-line { color: var(--muted); font-size: .9rem; margin: .5rem 0 0; }
+
+.sheet {
+  font-family: var(--mono); font-size: .8125rem; line-height: 1.75;
+  color: var(--body); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 1rem; margin: 1.1rem 0; overflow-x: auto;
+  white-space: pre; tab-size: 8;
+}
+/* Gold rather than bold: the mono face is loaded at one weight, and a
+   synthesised bold could move a column by a hair — which on a page whose
+   whole job is columns would be the one visible bug. */
+.sheet .ch { color: var(--gold); display: inline-block; transform-origin: 50% 90%; }
+@media (prefers-reduced-motion: no-preference) {
+  .sheet.flip .ch { animation: chord-flip .3s ease both; }
+}
+@keyframes chord-flip {
+  from { transform: rotateX(80deg); opacity: .25; }
+  to { transform: none; opacity: 1; }
+}
+
+.capo-full { margin-top: 1.25rem; }
+.capo-line {
+  display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; align-items: baseline;
+  padding: .55rem 0; border-bottom: 1px solid rgba(22, 48, 79, .55);
+}
+.capo-line b {
+  font-family: var(--display); font-weight: 800; color: var(--text);
+  flex: 0 0 6.5rem; font-size: .95rem;
+}
+.capo-line span { font-family: var(--mono); font-size: .75rem; color: var(--body); }
+.capo-line .capo-none { color: var(--muted); }
+.capo-row {
+  display: flex; gap: 1.25rem; align-items: baseline;
+  padding: .6rem 0; border-bottom: 1px solid rgba(22, 48, 79, .55);
+}
+.capo-fret {
+  font-family: var(--mono); font-size: .75rem; color: var(--muted);
+  flex: 0 0 4.5rem;
+}
+.capo-shape { font-family: var(--display); font-weight: 800; color: var(--text); }
+
+@media (max-width: 40rem) {
+  .toolbar { gap: .75rem 1rem; }
+  .field select { min-width: 7.5rem; }
+  .capo-line b { flex-basis: 100%; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  /* A section reveal.js has not reached yet is still at opacity 0, and would
+     print as a blank page. */
+  .reveal { opacity: 1 !important; transform: none !important; }
+  body { background: #fff; color: #000; }
+  .wrap { max-width: none; padding: 0; }
+  .hero { padding: 0 0 1rem; }
+  .hero h1 { color: #000; font-size: 1.6rem; }
+  .answer, .answer-detail, .capo-line b, .capo-shape { color: #000; }
+  .sheet { background: none; border: 0; padding: 0; color: #000; font-size: 10pt; }
+  .sheet .ch { color: #000; font-weight: 700; }
+  .capo-line, .capo-row { border-bottom: 1px solid #ccc; }
+  .capo-line span, .capo-fret { color: #333; }
+}
+</style>
+
+<!-- site.css holds every .reveal section at opacity 0 until reveal.js adds
+     .in, so with JavaScript switched off the explanations below the tool
+     would be a blank page. This puts them back. -->
+<noscript><style>.reveal { opacity: 1; transform: none; }</style></noscript>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Transpose a chord chart",
+  "url": "https://colabroom.com/transpose.html",
+  "applicationCategory": "MusicApplication",
+  "operatingSystem": "Web",
+  "browserRequirements": "Requires JavaScript. Your chart is not uploaded.",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@type": "Organization", "name": "CoLabRoom", "url": "https://colabroom.com/" }
+}
+</script>
+<!-- No HowTo block. Google retired the rich result, the SEO plan says skip it
+     and the guardian agrees — and the only way to write one was with a
+     totalTime, which is a claim about speed this site does not make. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does transposing change the chords under a slash?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. The bass moves with the root, so G/B up two is A/C sharp and not A/B. A bass written as a degree, like G:maj/3, is already counted from the root and does not move twice."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will it write sharps or flats?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Whichever the new key writes. Up one from D is E flat major, so D/A becomes E flat over B flat, not D sharp over A sharp. A flat you typed yourself is left alone."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is a capo the same as transposing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. A capo moves your hand, not the song. With a capo on four and G shapes under your fingers the band still hears B, which is why the line above the chart names both."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my chart sent anywhere?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The arithmetic runs in your browser and the chart never leaves the page. There is no account."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top no-print">
+    <a class="brand" href="index.html">CoLabRoom</a>
+    <nav class="pages">
+      <a href="chords.html">Chords</a>
+      <a href="takes.html">Takes</a>
+      <a href="analysis.html">What it heard</a>
+      <a href="songbook.html">Song sheet</a>
+      <a href="help.html">Stuck?</a>
+      <a href="bands.html">Your room</a>
+      <a href="openmic.html">Open Mic</a>
+    </nav>
+    <span class="sp"></span>
+    <a class="cta quiet" href="https://app.colabroom.com/">Sign in</a>
+    <a class="cta" href="https://app.colabroom.com/">Open the app</a>
+  </header>
+
+  <div class="hero inner">
+    <h1>Move it to<br>where you sing.</h1>
+    <p>Paste your chart. Pick a key. The words stay where they were.</p>
+    <div class="meta no-print">Free · No account · The chart never leaves this page</div>
+  </div>
+
+  <!-- The tool is the first thing on the page and there is already a song in
+       it. Somebody who arrived searching for this has a chart in their hand,
+       not a question about what transposing is. -->
+  <section class="tool" id="tool" data-tool="transpose">
+
+    <noscript>
+      <p class="problem">This one needs JavaScript switched on — the arithmetic
+      happens here in the page. Your chart is not sent anywhere either way.</p>
+    </noscript>
+
+    <div class="field no-print">
+      <label for="chart-in"><span>Your chart</span></label>
+      <textarea id="chart-in" class="chartbox" spellcheck="false" wrap="off"
+        aria-describedby="chart-note">
+Key: G
+
+[Verse]
+       G         D
+I left the porch light on
+    Em       C
+The long way round again
+
+Chorus:  C  G  D  Em</textarea>
+    </div>
+    <p class="quiet-line no-print" id="chart-note"></p>
+
+    <div class="toolbar no-print">
+      <label class="field">
+        <span>It's in</span>
+        <select id="from-key"></select>
+      </label>
+      <label class="field">
+        <span>Put it in</span>
+        <select id="to-key"></select>
+      </label>
+      <div class="field">
+        <span id="step-label">A semitone</span>
+        <div class="step" role="group" aria-labelledby="step-label">
+          <button type="button" id="down" aria-label="Down a semitone">−</button>
+          <button type="button" id="up" aria-label="Up a semitone">+</button>
+        </div>
+      </div>
+      <label class="field">
+        <span>Capo</span>
+        <select id="capo">
+          <option value="0">None</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+        </select>
+      </label>
+    </div>
+
+    <p class="answer" id="answer" role="status">—</p>
+    <pre class="sheet" id="sheet" tabindex="0" aria-label="Your chart, moved"></pre>
+
+    <div class="result-foot no-print">
+      <button type="button" class="cta" id="copy">Copy the chart</button>
+      <button type="button" class="cta quiet" id="print">Print it</button>
+    </div>
+  </section>
+
+  <section class="moment reveal no-print">
+    <div class="eyebrow">What moves</div>
+    <h2>The chords. Nothing else.</h2>
+    <p class="lede">
+      Your words stay where you put them, your tab stays tab, your notes to the
+      drummer stay your notes to the drummer. The only other things that change
+      are the key line and the capo line at the top, because if those said the
+      old key the chart would be lying.
+    </p>
+  </section>
+
+  <section class="moment reveal no-print">
+    <div class="eyebrow">Capo</div>
+    <h2>A capo moves your hand, not the song.</h2>
+    <p class="lede">
+      Put one on the 4th fret, play G shapes, and the band still hears B. So the
+      line above your chart names both — the shapes in front of you, and the key
+      you have to say out loud to everybody else. Take the capo off and the
+      chords go back up by the same four frets.
+    </p>
+  </section>
+
+  <section class="moment reveal no-print">
+    <div class="eyebrow">The fiddly bit</div>
+    <h2>G/B up two is A/C♯.</h2>
+    <p class="lede">
+      Not A/B. The note under the bass player's hand moves too, and a lot of
+      transposers forget. Sharps and flats follow the key you land in, as well:
+      up one from D is E♭ major, so D/A comes back E♭/B♭ rather than D♯/A♯.
+      Anything you spelled yourself is left exactly as you spelled it.
+    </p>
+  </section>
+
+  <nav class="keep-reading no-print" aria-label="The other free tools">
+    <p class="eyebrow">While you're here</p>
+    <div class="onward-row">
+      <a class="onward" href="capo.html">
+        <span class="where">Capo chart</span>
+        <span class="what">Which fret puts it on open shapes.</span>
+      </a>
+      <a class="onward" href="nashville-numbers.html">
+        <span class="where">Nashville numbers</span>
+        <span class="what">G C D is 1 4 5.</span>
+      </a>
+      <a class="onward" href="chords.html" data-carry-code>
+        <span class="where">Got a recording and no chart?</span>
+        <span class="what">It will write the chords down.</span>
+      </a>
+      <a class="onward" href="https://app.colabroom.com/">
+        <span class="where">Keep it with the song</span>
+        <span class="what">Your key, your capo, your band playing on it.</span>
+      </a>
+    </div>
+  </nav>
+
+  <footer class="no-print">
+    <span>CoLabRoom — songwriting for musicians</span>
+    <span class="sp"></span>
+    <a href="index.html#beta">Account deletion</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <a href="copyright.html">Copyright</a>
+  </footer>
+
+</div>
+
+<script type="module" src="tools.js"></script>
+<script src="reveal.js"></script>
+</body>
+</html>
