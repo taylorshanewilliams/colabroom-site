@@ -3,14 +3,15 @@
    Everything here is arithmetic on note names. The chart you paste is read,
    moved and drawn in the page and is never sent anywhere.
 
-   Two things at the bottom of this file do speak to the server, and the
-   pages say so rather than claiming otherwise: the anonymous step counters,
-   which carry a step name, a page name and the arrival code from the link
-   you came in on and nothing about your chart; and `localStorage`, which
-   keeps that arrival code so a later visit still knows which board it came
-   from. So every sentence these pages print about privacy is scoped to the
-   chart — "the chart never leaves your browser" — and none of them is the
-   absolute kind, because the absolute kind would not be true.
+   Two things do speak to the server, and the pages say so rather than
+   claiming otherwise: the anonymous step counters, sent by count.js (which
+   every page loads) and fed the tool's own steps from the bottom of this
+   file, which carry a step name, a page name and the arrival code from the
+   link you came in on and nothing about your chart; and `localStorage`,
+   where count.js keeps that arrival code so a later visit still knows which
+   board it came from. So every sentence these pages print about privacy is
+   scoped to the chart — "the chart never leaves your browser" — and none of
+   them is the absolute kind, because the absolute kind would not be true.
 
    It is a port of the Dart the app already runs, and the port is deliberate
    rather than a rewrite: the same tables, the same rules, the same edge cases
@@ -1576,72 +1577,25 @@ export function rowsAsText(rows) {
    The page
    ================================================================== */
 
-/* Where this visitor came from. A flier on a board, a card on a merch table,
-   a link under a video: each carries ?c=<code>. The page keeps the code for
-   the visit and for next time, the two counters below carry it, and the link
-   onward to the app carries it as ?from=, so an account made there can say
-   which board it came from. The code names a place, never a person.
+/* Counting, and where a visitor came from, belong to count.js, which every
+   page on the site loads before this file: it keeps the ?c= code, sends
+   `opened` once per load, counts `clicked_app` and carries the code onward to
+   the app as ?from=. This file counts only the tool's own steps (tool_used,
+   copied_text, clicked_onward) through the note() count.js leaves on
+   window.CoLab, the way chords.js does.
 
-   Copied from chords.js rather than shared, because the shared count.js that
-   both will load is in the other open pull request. When that lands, these
-   thirty lines come out and the pages load count.js instead — and this copy
-   is written to behave the way that file does, so nothing changes on the day
-   it is swapped in. */
-const ENDPOINT = 'https://gzcoclsfvazfhcheefhz.supabase.co/functions/v1/analyze-public';
-
-/* Which of the three pages this is, said by the page rather than read off the
-   address: GitHub Pages serves both /capo and /capo.html, and a 404 is served
-   at whatever was mistyped. */
-const PAGE = (() => {
-  // The arithmetic above is imported by `deno test`, where there is no page.
-  if (typeof document === 'undefined') return '';
-  const tag = document.querySelector('[data-tool]');
-  const name = tag === null ? '' : (tag.dataset.tool ?? '');
-  return /^[a-z0-9-]{1,24}$/.test(name) ? name : '';
-})();
-
-/* `fresh` says the code was on the address bar of *this* load — the moment
-   somebody actually walked through that door. A code read back out of storage
-   is the same person still reading, which is a different thing. */
-const ARRIVAL = (() => {
-  try {
-    const raw = new URL(location.href).searchParams.get('c');
-    if (raw && /^[a-z0-9-]{1,32}$/i.test(raw)) {
-      localStorage.setItem('colabroom_code', raw.toLowerCase());
-      return { code: raw.toLowerCase(), fresh: true };
-    }
-    return { code: localStorage.getItem('colabroom_code') || '', fresh: false };
-  } catch (_) {
-    return { code: '', fresh: false };
-  }
-})();
-const CODE = ARRIVAL.code;
-
-/* Add one to a daily counter.
-
-   `page` rides along so the counters can be split per page. The function
-   ignores it today — the step allowlist is a check constraint in migration
-   0099 and only knows the eleven steps the chord tool records — so until the
-   endpoint reads it, an `opened` from here is added to the chord tool's own.
-   Sending it now means the day the endpoint learns to read it, nothing here
-   has to be republished. count.js on the other branch sends it for the same
-   reason. */
-function send(step, stepCode) {
-  try {
-    fetch(ENDPOINT + '/note?step=' + encodeURIComponent(step) +
-      (stepCode ? '&c=' + encodeURIComponent(stepCode) : '') +
-      (PAGE ? '&page=' + encodeURIComponent(PAGE) : ''), {
-      cache: 'no-store',
-      keepalive: true,
-    }).catch(() => {});
-  } catch (_) {
-    /* Measurement never breaks the page it measures. */
-  }
+   Read when a step happens rather than when this module loads, and a no-op
+   when there is no count.js: the arithmetic above is imported by `deno test`,
+   where there is no page, and if count.js ever fails to load the tool still
+   works and only the counting is missing, which is the right way round. */
+function counter() {
+  return globalThis.CoLab ?? null;
 }
 
-/* The ordinary shape, used by everything that happens after the page is up:
-   the code it was found on rides along. */
-function note(step) { send(step, CODE); }
+function note(step) {
+  const colab = counter();
+  if (colab !== null && typeof colab.note === 'function') colab.note(step);
+}
 
 const escapeHtml = (text) => text
   .replace(/&/g, '&amp;')
@@ -2139,26 +2093,18 @@ function wireShared() {
     if ((link.getAttribute('href') ?? '').includes('app.colabroom.com')) continue;
     link.addEventListener('click', () => note('clicked_onward'));
   }
-  for (const link of document.querySelectorAll('a[href*="app.colabroom.com"]')) {
-    link.addEventListener('click', () => note('clicked_app'));
-    // The code rides on to the app, where an account claims it.
-    if (CODE) {
-      try {
-        const onward = new URL(link.href);
-        onward.searchParams.set('from', CODE);
-        link.href = onward.toString();
-      } catch (_) { /* A link that cannot be rewritten still works as it was. */ }
-    }
-  }
+  // A link into the app is count.js's: it counts the click as clicked_app
+  // and carries the code on as ?from=.
   // And on to the chord tool, which reads ?c= the same way this page did.
   // Written onto the attribute rather than through URL, so the link stays the
   // relative one it was and a flier code still reaches the page it points at.
-  if (CODE) {
+  const code = counter()?.code ?? '';
+  if (code) {
     for (const link of document.querySelectorAll('a[data-carry-code]')) {
       const raw = link.getAttribute('href');
       if (raw === null || /[?&]c=/.test(raw)) continue;
       link.setAttribute('href',
-        raw + (raw.includes('?') ? '&' : '?') + 'c=' + encodeURIComponent(CODE));
+        raw + (raw.includes('?') ? '&' : '?') + 'c=' + encodeURIComponent(code));
     }
   }
 }
@@ -2171,11 +2117,6 @@ if (typeof document !== 'undefined') {
     if (which === 'capo') wireCapo();
     if (which === 'numbers') wireNumbers();
     wireShared();
-    /* The code only rides on this one when it was on the address bar of this
-       load. A step carrying a code is written to `arrivals`, and attaching a
-       remembered code here would mean one person who scans a flier and then
-       reads three pages records three arrivals for that board. The report
-       exists to compare boards; this is the line that keeps it able to. */
-    send('opened', ARRIVAL.fresh ? CODE : '');
+    // `opened` is count.js's, sent once for this load before this ran.
   }
 }
